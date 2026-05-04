@@ -6,7 +6,7 @@
   <ItemGroup>
     <!-- Static code analysis -->
     <PackageVersion Include="Microsoft.AspNetCore.Authorization" Version="10.0.7" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.7" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.2" />
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.19.0.132793" />
     <!-- Application -->
