@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Pgvector;
 
 #nullable disable
 
@@ -17,13 +18,17 @@ public partial class InitialDatabase : Migration
         migrationBuilder.EnsureSchema(
             name: "public");
 
+        migrationBuilder.Sql("CREATE EXTENSION IF NOT EXISTS vector;");
+
         migrationBuilder.CreateTable(
             name: "permissions",
             schema: "public",
             columns: table => new
             {
                 id = table.Column<Guid>(type: "uuid", nullable: false),
-                description = table.Column<string>(type: "text", nullable: false)
+                description = table.Column<string>(type: "text", nullable: false),
+                created_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()"),
+                updated_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
             },
             constraints: table =>
             {
@@ -39,7 +44,9 @@ public partial class InitialDatabase : Migration
                 email = table.Column<string>(type: "text", nullable: false),
                 first_name = table.Column<string>(type: "text", nullable: false),
                 last_name = table.Column<string>(type: "text", nullable: false),
-                password_hash = table.Column<string>(type: "text", nullable: false)
+                password_hash = table.Column<string>(type: "text", nullable: false),
+                created_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()"),
+                updated_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
             },
             constraints: table =>
             {
@@ -59,7 +66,10 @@ public partial class InitialDatabase : Migration
                 is_completed = table.Column<bool>(type: "boolean", nullable: false),
                 created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                 completed_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                priority = table.Column<int>(type: "integer", nullable: false)
+                priority = table.Column<int>(type: "integer", nullable: false),
+                embedding = table.Column<Vector>(type: "vector(1536)", nullable: true),
+                created_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()"),
+                updated_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
             },
             constraints: table =>
             {
@@ -80,7 +90,9 @@ public partial class InitialDatabase : Migration
             {
                 id = table.Column<Guid>(type: "uuid", nullable: false),
                 user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                permission_id = table.Column<Guid>(type: "uuid", nullable: false)
+                permission_id = table.Column<Guid>(type: "uuid", nullable: false),
+                created_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()"),
+                updated_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
             },
             constraints: table =>
             {
@@ -104,12 +116,12 @@ public partial class InitialDatabase : Migration
         migrationBuilder.InsertData(
             schema: "public",
             table: "permissions",
-            columns: new[] { "id", "description" },
+            columns: ["id", "description", "updated_on"],
             values: new object[,]
             {
-                { new Guid("5bbb01f3-adbf-4fed-b5a6-70d3fe07da7d"), "todo:access" },
-                { new Guid("d5b5de09-34d0-4f34-8d60-410db716454b"), "permission:access" },
-                { new Guid("f7c8b043-d353-4a0a-8745-e0ce95a414ac"), "users:access" }
+                { new Guid("5bbb01f3-adbf-4fed-b5a6-70d3fe07da7d"), "todo:access", null },
+                { new Guid("d5b5de09-34d0-4f34-8d60-410db716454b"), "permission:access", null },
+                { new Guid("f7c8b043-d353-4a0a-8745-e0ce95a414ac"), "users:access", null }
             });
 
         migrationBuilder.CreateIndex(
@@ -143,6 +155,7 @@ public partial class InitialDatabase : Migration
             table: "users",
             column: "email",
             unique: true);
+
     }
 
     /// <inheritdoc />

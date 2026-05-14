@@ -1,14 +1,17 @@
 ﻿using Application.Abstractions.Behaviors;
 using Application.Abstractions.Messaging;
+using Application.Embeddings;
 using FluentValidation;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OpenAI;
 using SharedKernel;
 
 namespace Application;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApplication(this IServiceCollection services)
+    public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
     {
         services.Scan(scan => scan.FromAssembliesOf(typeof(DependencyInjection))
             .AddClasses(classes => classes.AssignableTo(typeof(IQueryHandler<,>)), publicOnly: false)
@@ -34,6 +37,13 @@ public static class DependencyInjection
             .WithScopedLifetime());
 
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly, includeInternalTypes: true);
+
+        services.AddScoped<IEmbeddingsService, EmbeddingsService>();
+
+        // OpenAI
+        services.AddSingleton(new OpenAIClient(
+            configuration["AIConfig:OpenAIKey"]
+        ));
 
         return services;
     }

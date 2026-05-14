@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions.Messaging;
+using Application.Users.Login;
 
 namespace Application.Users.GetById;
 

@@ -13,6 +13,10 @@ internal sealed class PermissionConfiguration : IEntityTypeConfiguration<Permiss
 
         builder.HasIndex(u => u.Description).IsUnique();
 
+        builder.Property(x => x.CreatedOn)
+            .HasDefaultValueSql("NOW()")
+            .ValueGeneratedOnAdd();
+
         builder.HasData(
             new Permission
             {

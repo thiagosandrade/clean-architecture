@@ -21,7 +21,7 @@ services:
       - postgres
 
   postgres:
-    image: postgres:17
+    image: ankane/pgvector:latest
     container_name: postgres
     environment:
       - POSTGRES_DB=clean-architecture

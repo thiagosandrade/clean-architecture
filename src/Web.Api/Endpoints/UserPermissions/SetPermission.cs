@@ -1,11 +1,12 @@
-﻿using Application.Abstractions.Messaging;
+﻿using Application.Abstractions.Constants;
+using Application.Abstractions.Messaging;
 using Application.Users.Register;
 using Application.Users.SetPermission;
 using SharedKernel;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
 
-namespace Web.Api.Endpoints.Users;
+namespace Web.Api.Endpoints.UserPermissions;
 
 internal sealed class SetPermission : IEndpoint
 {
@@ -13,7 +14,7 @@ internal sealed class SetPermission : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("users/setpermission", async (
+        app.MapPost("user-permission/set", async (
             Request request,
             ICommandHandler<SetPermissionToUserCommand, Guid> handler,
             CancellationToken cancellationToken) =>
@@ -24,6 +25,7 @@ internal sealed class SetPermission : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithTags(Tags.Users);
+        .HasPermission(PermissionsConstants.UsersAccess)
+        .WithTags(Tags.UsersPermission);
     }
 }

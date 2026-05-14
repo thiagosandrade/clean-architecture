@@ -40,12 +40,12 @@ internal sealed class CreateTodoCommandHandler(
             CreatedAt = dateTimeProvider.UtcNow
         };
 
-        todoItem.Raise(new TodoItemCreatedDomainEvent(todoItem.Id));
-
         context.TodoItems.Add(todoItem);
 
-        await context.SaveChangesAsync(cancellationToken);
+        todoItem.Raise(new TodoItemCreatedDomainEvent(todoItem.Id));
 
+        await context.SaveChangesAsync(cancellationToken);
+        
         return todoItem.Id;
     }
 }

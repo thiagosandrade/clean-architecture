@@ -18,6 +18,7 @@ internal sealed class GetTodosQueryHandler(IApplicationDbContext context, IUserC
         }
 
         List<TodoResponse> todos = await context.TodoItems
+            .AsNoTracking()
             .Where(todoItem => todoItem.UserId == query.UserId)
             .Select(todoItem => new TodoResponse
             {

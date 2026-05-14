@@ -19,9 +19,7 @@ internal sealed class SetPermissionToUserCommandHandler(IApplicationDbContext co
             return Result.Failure<Guid>(UserErrors.NotFound(command.UserId));
         }
 
-        (bool permissionExists, string? permissionDescription) permissionCheck = await CheckIfPermissionExists(command, cancellationToken);
-
-        if (!permissionCheck.permissionExists)
+        if (!await CheckIfPermissionExists(command, cancellationToken))
         {
             return Result.Failure<Guid>(UserErrors.PermissionNotFound(command.PermissionId));
         }
@@ -51,12 +49,11 @@ internal sealed class SetPermissionToUserCommandHandler(IApplicationDbContext co
         return await context.UserPermissions.AnyAsync(x => x.UserId == command.UserId && x.PermissionId == command.PermissionId, cancellationToken);
     }
 
-    private async Task<(bool permissionExists,string? permissionDescription)> CheckIfPermissionExists(SetPermissionToUserCommand command, CancellationToken cancellationToken)
+    private async Task<bool> CheckIfPermissionExists(SetPermissionToUserCommand command, CancellationToken cancellationToken)
     {
         bool permissionExists = await context.Permissions.AnyAsync(x => x.Id == command.PermissionId, cancellationToken);
-        Permission? permissionDescription = await context.Permissions.FirstOrDefaultAsync(x => x.Id == command.PermissionId, cancellationToken);
 
-        return (permissionExists, permissionDescription?.Description);
+        return permissionExists;
     }
 
     private async Task<bool> CheckIfUserExists(SetPermissionToUserCommand command, CancellationToken cancellationToken)

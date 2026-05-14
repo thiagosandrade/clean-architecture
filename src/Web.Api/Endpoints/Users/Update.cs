@@ -1,4 +1,5 @@
-﻿using Application.Abstractions.Messaging;
+﻿using Application.Abstractions.Constants;
+using Application.Abstractions.Messaging;
 using Application.Users.Update;
 using SharedKernel;
 using Web.Api.Extensions;
@@ -29,6 +30,7 @@ internal sealed class Update : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
+        .HasPermission(PermissionsConstants.UsersAccess)
         .WithTags(Tags.Users);
     }
 }

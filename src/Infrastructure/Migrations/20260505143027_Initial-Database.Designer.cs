@@ -7,14 +7,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using Pgvector;
 
 #nullable disable
 
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260504201944_Add-Created-Updated")]
-    partial class AddCreatedUpdated
+    [Migration("20260505143027_Initial-Database")]
+    partial class InitialDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,15 +36,17 @@ namespace Infrastructure.Migrations
                         .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedOn")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_on");
+                        .HasColumnName("created_on")
+                        .HasDefaultValueSql("NOW()");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("description");
 
-                    b.Property<DateTime>("UpdatedOn")
+                    b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_on");
 
@@ -61,22 +64,19 @@ namespace Infrastructure.Migrations
                         {
                             Id = new Guid("5bbb01f3-adbf-4fed-b5a6-70d3fe07da7d"),
                             CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "todo:access",
-                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            Description = "todo:access"
                         },
                         new
                         {
                             Id = new Guid("f7c8b043-d353-4a0a-8745-e0ce95a414ac"),
                             CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "users:access",
-                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            Description = "users:access"
                         },
                         new
                         {
                             Id = new Guid("d5b5de09-34d0-4f34-8d60-410db716454b"),
                             CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "permission:access",
-                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            Description = "permission:access"
                         });
                 });
 
@@ -96,8 +96,10 @@ namespace Infrastructure.Migrations
                         .HasColumnName("created_at");
 
                     b.Property<DateTime>("CreatedOn")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_on");
+                        .HasColumnName("created_on")
+                        .HasDefaultValueSql("NOW()");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -107,6 +109,10 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime?>("DueDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("due_date");
+
+                    b.Property<Vector>("Embedding")
+                        .HasColumnType("vector(1536)")
+                        .HasColumnName("embedding");
 
                     b.Property<bool>("IsCompleted")
                         .HasColumnType("boolean")
@@ -121,7 +127,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("priority");
 
-                    b.Property<DateTime>("UpdatedOn")
+                    b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_on");
 
@@ -146,8 +152,10 @@ namespace Infrastructure.Migrations
                         .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedOn")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_on");
+                        .HasColumnName("created_on")
+                        .HasDefaultValueSql("NOW()");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -169,7 +177,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("password_hash");
 
-                    b.Property<DateTime>("UpdatedOn")
+                    b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_on");
 
@@ -191,14 +199,16 @@ namespace Infrastructure.Migrations
                         .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedOn")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_on");
+                        .HasColumnName("created_on")
+                        .HasDefaultValueSql("NOW()");
 
                     b.Property<Guid>("PermissionId")
                         .HasColumnType("uuid")
                         .HasColumnName("permission_id");
 
-                    b.Property<DateTime>("UpdatedOn")
+                    b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_on");
 

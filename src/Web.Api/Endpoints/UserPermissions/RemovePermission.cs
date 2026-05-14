@@ -1,10 +1,11 @@
-﻿using Application.Abstractions.Messaging;
+﻿using Application.Abstractions.Constants;
+using Application.Abstractions.Messaging;
 using Application.Users.RemovePermission;
 using SharedKernel;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
 
-namespace Web.Api.Endpoints.Users;
+namespace Web.Api.Endpoints.UserPermissions;
 
 internal sealed class RemovePermission : IEndpoint
 {
@@ -12,7 +13,7 @@ internal sealed class RemovePermission : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("users/removepermission", async (
+        app.MapPost("user-permission/remove", async (
             Request request,
             ICommandHandler<RemovePermissionFromUserCommand, Guid> handler,
             CancellationToken cancellationToken) =>
@@ -23,6 +24,7 @@ internal sealed class RemovePermission : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
-        .WithTags(Tags.Users);
+        .HasPermission(PermissionsConstants.UsersAccess)
+        .WithTags(Tags.UsersPermission);
     }
 }

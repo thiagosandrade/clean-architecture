@@ -4,6 +4,7 @@
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="OpenAI" />
     <PackageReference Include="Serilog" />
     <PackageReference Include="Scrutor" />
   </ItemGroup>

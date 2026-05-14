@@ -9,5 +9,9 @@ internal sealed class UserPermissionConfiguration : IEntityTypeConfiguration<Use
     public void Configure(EntityTypeBuilder<UserPermission> builder)
     {
         builder.HasKey(u => u.Id);
+
+        builder.Property(x => x.CreatedOn)
+            .HasDefaultValueSql("NOW()")
+            .ValueGeneratedOnAdd();
     }
 }

@@ -1,4 +1,5 @@
-﻿using Application.Abstractions.Messaging;
+﻿using Application.Abstractions.Constants;
+using Application.Abstractions.Messaging;
 using Application.Users.Remove;
 using Application.Users.SetPermission;
 using SharedKernel;
@@ -24,6 +25,7 @@ internal sealed class Remove : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
+        .HasPermission(PermissionsConstants.UsersAccess)
         .WithTags(Tags.Users);
     }
 }

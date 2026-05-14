@@ -28,7 +28,7 @@ public sealed class CachedPermissionProvider : IPermissionProvider
 
         var cacheOptions = new MemoryCacheEntryOptions
         {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
         };
 
         _cache.Set(cacheKey, permissions, cacheOptions);

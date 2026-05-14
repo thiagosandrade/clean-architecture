@@ -9,4 +9,6 @@ public sealed record UserResponse
     public string FirstName { get; init; }
 
     public string LastName { get; init; }
+
+    public DateTime CreatedOn { get; set; }
 }

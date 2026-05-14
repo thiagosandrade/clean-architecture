@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
+using Application.Users.Login;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
@@ -18,13 +19,15 @@ internal sealed class GetUserByIdQueryHandler(IApplicationDbContext context, IUs
         }
 
         UserResponse? user = await context.Users
+            .AsNoTracking()
             .Where(u => u.Id == query.UserId)
             .Select(u => new UserResponse
             {
                 Id = u.Id,
                 FirstName = u.FirstName,
                 LastName = u.LastName,
-                Email = u.Email
+                Email = u.Email,
+                CreatedOn = u.CreatedOn
             })
             .SingleOrDefaultAsync(cancellationToken);
 

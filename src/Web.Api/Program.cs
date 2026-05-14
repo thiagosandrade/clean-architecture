@@ -14,13 +14,17 @@ builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configu
 builder.Services.AddSwaggerGenWithAuth();
 
 builder.Services
-    .AddApplication()
+    .AddApplication(builder.Configuration)
     .AddPresentation()
     .AddInfrastructure(builder.Configuration);
 
 builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
 
+builder.AllowCors();
+
 WebApplication app = builder.Build();
+
+app.UseCors();
 
 app.MapEndpoints();
 

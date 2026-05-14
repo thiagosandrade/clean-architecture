@@ -10,6 +10,8 @@ public sealed record UserResponse
 
     public string LastName { get; init; }
 
+    public DateTime CreatedOn { get; set; }
+
     public List<PermissionResponse> Permissions { get; init; }
 }
 

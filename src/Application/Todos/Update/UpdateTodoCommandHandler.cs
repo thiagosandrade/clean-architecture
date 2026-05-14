@@ -7,7 +7,7 @@ using SharedKernel;
 namespace Application.Todos.Update;
 
 internal sealed class UpdateTodoCommandHandler(
-    IApplicationDbContext context)
+    IApplicationDbContext context, IDateTimeProvider dateTimeProvider)
     : ICommandHandler<UpdateTodoCommand>
 {
     public async Task<Result> Handle(UpdateTodoCommand command, CancellationToken cancellationToken)
@@ -21,6 +21,7 @@ internal sealed class UpdateTodoCommandHandler(
         }
 
         todoItem.Description = command.Description;
+        todoItem.UpdatedOn = dateTimeProvider.UtcNow;
 
         await context.SaveChangesAsync(cancellationToken);
         
