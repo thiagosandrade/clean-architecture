@@ -13,12 +13,20 @@ internal sealed class Get : IEndpoint
     {
         app.MapGet("todos", async (
             Guid userId,
-            IQueryHandler<GetTodosQuery, List<TodoResponse>> handler,
+            int page,
+            int size,
+            string propertyName,
+            bool descending,
+            IQueryHandler<GetTodosQuery, PagedResponse<TodoResponse>> handler,
             CancellationToken cancellationToken) =>
         {
-            var query = new GetTodosQuery(userId);
+            var query = new GetTodosQuery(
+                userId,
+                new Paginated(page, size),
+                new Sorted(propertyName, descending)
+            );
 
-            Result<List<TodoResponse>> result = await handler.Handle(query, cancellationToken);
+            Result<PagedResponse<TodoResponse>> result = await handler.Handle(query, cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
