@@ -2,6 +2,9 @@
 using Application.Abstractions.Messaging;
 using Application.Todos.Get;
 using Application.Todos.Search;
+using Domain.Users;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SharedKernel;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
@@ -14,12 +17,22 @@ internal sealed class Search : IEndpoint
     {
         app.MapGet("todos/search", async (
             string searchtext,
-            IQueryHandler<SearchTodosQuery, List<SearchTodoResponse>> handler,
+            Guid userId,
+            int page,
+            int size,
+            string propertyName,
+            bool descending,
+            IQueryHandler<SearchTodosQuery, PagedResponse<SearchTodoResponse>> handler,
             CancellationToken cancellationToken) =>
         {
-            var query = new SearchTodosQuery(searchtext);
+            var query = new SearchTodosQuery(
+                searchtext,
+                userId,
+                new Paginated(page, size),
+                new Sorted(propertyName, descending)
+            );
 
-            Result<List<SearchTodoResponse>> result = await handler.Handle(query, cancellationToken);
+            Result<PagedResponse<SearchTodoResponse>> result = await handler.Handle(query, cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
