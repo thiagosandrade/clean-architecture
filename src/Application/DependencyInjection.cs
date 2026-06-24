@@ -1,6 +1,8 @@
 ﻿using Application.Abstractions.Behaviors;
 using Application.Abstractions.Messaging;
-using Application.Embeddings;
+using Application.OpenAI.Embeddings;
+using Application.OpenAI.Enrichment;
+using Application.OpenAI.Parser;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,6 +41,8 @@ public static class DependencyInjection
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly, includeInternalTypes: true);
 
         services.AddScoped<IEmbeddingsService, EmbeddingsService>();
+        services.AddScoped<IEnrichmentService, EnrichmentService>();
+        services.AddScoped<IParseTodoEnrichmentService, ParseTodoEnrichmentService>();
 
         // OpenAI
         services.AddSingleton(new OpenAIClient(

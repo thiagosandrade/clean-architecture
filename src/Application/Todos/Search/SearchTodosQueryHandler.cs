@@ -2,7 +2,7 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Extensions;
 using Application.Abstractions.Messaging;
-using Application.Embeddings;
+using Application.OpenAI.Embeddings;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Pgvector;
@@ -41,20 +41,25 @@ internal sealed class SearchTodosQueryHandler(
                 .Where(x =>
                     x.UserId == query.UserId &&
                     x.Embedding != null)
-                .OrderBy(x =>
-                    x.Embedding!.CosineDistance(queryVector))
-                .Take(SemanticCandidateLimit)
-                .Select(todoItem => new SearchTodoResponse
+                .Select(todoItem => new
                 {
-                    Id = todoItem.Id,
-                    UserId = todoItem.UserId,
-                    Description = todoItem.Description,
-                    DueDate = todoItem.DueDate,
-                    Labels = todoItem.Labels,
-                    IsCompleted = todoItem.IsCompleted,
-                    CreatedAt = todoItem.CreatedAt,
-                    CompletedAt = todoItem.CompletedAt,
-                    Priority = todoItem.Priority
+                    Todo = todoItem,
+                    Distance = todoItem.Embedding!.CosineDistance(queryVector)
+                })
+                .OrderBy(x => x.Distance)
+                .Take(SemanticCandidateLimit)
+                .Select(x => new SearchTodoResponse
+                {
+                    Id = x.Todo.Id,
+                    UserId = x.Todo.UserId,
+                    Description = x.Todo.Description,
+                    DueDate = x.Todo.DueDate,
+                    Labels = x.Todo.Labels,
+                    Categories = x.Todo.Categories,
+                    IsCompleted = x.Todo.IsCompleted,
+                    CreatedAt = x.Todo.CreatedAt,
+                    CompletedAt = x.Todo.CompletedAt,
+                    Priority = x.Todo.Priority
                 });
 
 

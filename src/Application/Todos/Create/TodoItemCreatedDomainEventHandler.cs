@@ -1,6 +1,6 @@
 ﻿using Application.Abstractions.Data;
 using Application.Abstractions.Extensions;
-using Application.Embeddings;
+using Application.OpenAI.Enrichment;
 using Domain.Todos;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +10,7 @@ namespace Application.Todos.Create;
 
 internal sealed class TodoItemCreatedDomainEventHandler(
     IApplicationDbContext context, 
-    IEmbeddingsService embeddingsService,
+    IEnrichmentService enrichmentService,
     IDateTimeProvider dateTimeProvider) 
     : IDomainEventHandler<TodoItemCreatedDomainEvent>
 {
@@ -18,11 +18,12 @@ internal sealed class TodoItemCreatedDomainEventHandler(
     {
         TodoItem todoItem = await context.TodoItems.FirstAsync(x => x.Id == domainEvent.TodoItemId, cancellationToken: cancellationToken);
 
-        float[] embedding = await embeddingsService.GenerateEmbeddingsAsync(todoItem.Description);
+        EnrichmentResult enrichmentResult = await enrichmentService.EnrichAsync(todoItem.Description, todoItem.Labels, cancellationToken);
 
-        todoItem.Embedding = embedding.ToVector();
+        todoItem.Embedding = enrichmentResult.Embedding.ToVector();
+        todoItem.Categories = [.. enrichmentResult.Categories];
         todoItem.UpdatedOn = dateTimeProvider.UtcNow;
-
+        
         context.TodoItems.Update(todoItem);
 
         await context.SaveChangesAsync(cancellationToken);

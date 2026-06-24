@@ -1,4 +1,4 @@
-﻿namespace Application.Embeddings;
+﻿namespace Application.OpenAI.Embeddings;
 
 public interface IEmbeddingsService
 {

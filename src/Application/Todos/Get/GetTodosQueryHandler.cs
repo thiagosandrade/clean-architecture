@@ -28,6 +28,7 @@ internal sealed class GetTodosQueryHandler(IApplicationDbContext context, IUserC
                 Description = todoItem.Description,
                 DueDate = todoItem.DueDate,
                 Labels = todoItem.Labels,
+                Categories = todoItem.Categories,
                 IsCompleted = todoItem.IsCompleted,
                 CreatedAt = todoItem.CreatedAt,
                 CompletedAt = todoItem.CompletedAt,

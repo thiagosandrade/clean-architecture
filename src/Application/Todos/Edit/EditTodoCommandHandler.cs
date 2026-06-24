@@ -36,6 +36,13 @@ internal sealed class EditTodoCommandHandler(
             return Result.Failure<Guid>(TodoItemErrors.NotFound(command.Id));
         }
 
+        bool needsEnrichment = false;
+        
+        if (todoItem.Description != command.Description && todoItem.Labels != command.Labels)
+        {
+            needsEnrichment = true;
+        }
+
         todoItem.Description = command.Description;
         todoItem.Priority = command.Priority;
         todoItem.DueDate = command.DueDate;
@@ -51,7 +58,10 @@ internal sealed class EditTodoCommandHandler(
 
         context.TodoItems.Update(todoItem);
 
-        todoItem.Raise(new TodoItemEditedDomainEvent(todoItem.Id));
+        if (needsEnrichment)
+        {
+            todoItem.Raise(new TodoItemEditedDomainEvent(todoItem.Id));
+        }
 
         await context.SaveChangesAsync(cancellationToken);
         
