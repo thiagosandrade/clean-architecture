@@ -2,5 +2,6 @@
 
 public interface IEmbeddingsService
 {
-    Task<float[]> GenerateEmbeddingsAsync(string description);
+    Task<float[]> GenerateEmbeddingsForSearchAsync(string description);
+    Task<float[]> GenerateEmbeddingsAsync(string description, IReadOnlyCollection<string> categories);
 }

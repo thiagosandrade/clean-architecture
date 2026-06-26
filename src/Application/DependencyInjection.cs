@@ -41,8 +41,9 @@ public static class DependencyInjection
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly, includeInternalTypes: true);
 
         services.AddScoped<IEmbeddingsService, EmbeddingsService>();
-        services.AddScoped<IEnrichmentService, EnrichmentService>();
+        services.AddScoped<ICategoryEnrichmentService, CategoryEnrichmentService>();
         services.AddScoped<IParseTodoEnrichmentService, ParseTodoEnrichmentService>();
+        services.AddScoped<ISubTaskEnrichmentService, SubTaskEnrichmentService>();
 
         // OpenAI
         services.AddSingleton(new OpenAIClient(

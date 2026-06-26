@@ -30,7 +30,7 @@ internal sealed class GetTodosQueryHandler(IApplicationDbContext context, IUserC
                 Labels = todoItem.Labels,
                 Categories = todoItem.Categories,
                 IsCompleted = todoItem.IsCompleted,
-                CreatedAt = todoItem.CreatedAt,
+                CreatedAt = todoItem.CreatedOn,
                 CompletedAt = todoItem.CompletedAt,
                 Priority = todoItem.Priority
             });

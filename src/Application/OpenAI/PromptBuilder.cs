@@ -2,14 +2,13 @@
 
 public static class PromptBuilder
 {
-    public static string TodoCategories(string description)
-    {
-        return $"""
+    public static string TodoCategories(string description) =>
+        $"""
             Categorize the following description into a list of relevant categories. 
             Return the categories as a JSON object with a single property "Categories" which is an array of strings.
             Description: "{description}"
             """;
-    }
+    
     public static string TodoDescription(string description, IEnumerable<string> categories)
     {
         string categoriesList = string.Join(", ", categories);
@@ -21,9 +20,8 @@ public static class PromptBuilder
             """;
     }
 
-    public static string ParseTextForTodo(string text, Guid UserId) 
-    {
-        return $"""
+    public static string ParseTextForTodo(string text, Guid UserId) =>
+        $"""
             Parse the following text and extract the relevant information to create a todo item. 
             Return the extracted information as a JSON object with the following properties:
             - Description: string
@@ -33,5 +31,19 @@ public static class PromptBuilder
             - UserId: {UserId}
             Text: "{text}"
             """;
-    }
+
+    public static string SubTaskBreakdown(string description) =>
+        $$"""
+        TODO:
+        {{description}}
+
+        Output:
+
+        {
+          "subTasks": [
+            "subtask 1",
+            "subtask 2"
+          ]
+        }
+        """;
 }

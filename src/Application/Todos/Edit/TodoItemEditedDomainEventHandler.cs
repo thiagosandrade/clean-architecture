@@ -10,7 +10,7 @@ namespace Application.Todos.Edit;
 
 internal sealed class TodoItemEditedDomainEventHandler(
     IApplicationDbContext context,
-    IEnrichmentService enrichmentService,
+    ICategoryEnrichmentService categoryEnrichmentService,
     IDateTimeProvider dateTimeProvider) 
     : IDomainEventHandler<TodoItemEditedDomainEvent>
 {
@@ -18,10 +18,10 @@ internal sealed class TodoItemEditedDomainEventHandler(
     {
         TodoItem todoItem = await context.TodoItems.FirstAsync(x => x.Id == domainEvent.TodoItemId, cancellationToken: cancellationToken);
 
-        EnrichmentResult enrichmentResult = await enrichmentService.EnrichAsync(todoItem.Description, todoItem.Labels, cancellationToken);
-        
-        todoItem.Embedding = enrichmentResult.Embedding.ToVector();
-        todoItem.Categories = [.. enrichmentResult.Categories];
+        IReadOnlyCollection<string> categories = await categoryEnrichmentService.EnrichAsync(todoItem.Description, todoItem.Labels, cancellationToken);
+
+        todoItem.Categories = [.. categories];
+
         todoItem.UpdatedOn = dateTimeProvider.UtcNow;
 
         context.TodoItems.Update(todoItem);

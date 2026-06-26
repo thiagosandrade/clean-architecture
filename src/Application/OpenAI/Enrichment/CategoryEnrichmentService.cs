@@ -10,12 +10,9 @@ using OpenAI.Chat;
 
 namespace Application.OpenAI.Enrichment;
 
-public class EnrichmentService(
-    OpenAIClient client,
-    IConfiguration configuration,
-    IEmbeddingsService embeddingsService) : IEnrichmentService
+public class CategoryEnrichmentService(OpenAIClient client, IConfiguration configuration) : ICategoryEnrichmentService
 {
-    public async Task<EnrichmentResult> EnrichAsync(string description, IEnumerable<string> userLabels, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyCollection<string>> EnrichAsync(string description, IEnumerable<string> userLabels, CancellationToken cancellationToken = default)
     {
         string model = configuration["AIConfig:ChatModel"];
 
@@ -45,11 +42,7 @@ public class EnrichmentService(
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
-        string embeddingText = PromptBuilder.TodoDescription(description, categories);
-
-        float[] embedding = await embeddingsService.GenerateEmbeddingsAsync(embeddingText);
-
-        return new EnrichmentResult(categories, embedding);
+        return categories;
     }
 
     private sealed class CategoryResponse

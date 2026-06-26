@@ -29,7 +29,7 @@ internal sealed class SearchTodosQueryHandler(
         }
 
         // 1. Generate embedding for search text
-        float[] vectorArray = await embeddingsService.GenerateEmbeddingsAsync(query.Searchtext);
+        float[] vectorArray = await embeddingsService.GenerateEmbeddingsForSearchAsync(query.Searchtext);
 
         // 2. Convert to pgvector
         Vector queryVector = vectorArray.ToVector();
@@ -57,7 +57,7 @@ internal sealed class SearchTodosQueryHandler(
                     Labels = x.Todo.Labels,
                     Categories = x.Todo.Categories,
                     IsCompleted = x.Todo.IsCompleted,
-                    CreatedAt = x.Todo.CreatedAt,
+                    CreatedAt = x.Todo.CreatedOn,
                     CompletedAt = x.Todo.CompletedAt,
                     Priority = x.Todo.Priority
                 });

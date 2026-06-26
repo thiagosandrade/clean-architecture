@@ -1,5 +1,7 @@
 ﻿using Application.Abstractions.Data;
 using Application.Abstractions.Extensions;
+using Application.OpenAI;
+using Application.OpenAI.Embeddings;
 using Application.OpenAI.Enrichment;
 using Domain.Todos;
 using Domain.Users;
@@ -10,7 +12,8 @@ namespace Application.Todos.Create;
 
 internal sealed class TodoItemCreatedDomainEventHandler(
     IApplicationDbContext context, 
-    IEnrichmentService enrichmentService,
+    ICategoryEnrichmentService categoryEnrichmentService,
+    IEmbeddingsService embeddingsService,
     IDateTimeProvider dateTimeProvider) 
     : IDomainEventHandler<TodoItemCreatedDomainEvent>
 {
@@ -18,10 +21,13 @@ internal sealed class TodoItemCreatedDomainEventHandler(
     {
         TodoItem todoItem = await context.TodoItems.FirstAsync(x => x.Id == domainEvent.TodoItemId, cancellationToken: cancellationToken);
 
-        EnrichmentResult enrichmentResult = await enrichmentService.EnrichAsync(todoItem.Description, todoItem.Labels, cancellationToken);
+        IReadOnlyCollection<string> categories = await categoryEnrichmentService.EnrichAsync(todoItem.Description, todoItem.Labels, cancellationToken);
 
-        todoItem.Embedding = enrichmentResult.Embedding.ToVector();
-        todoItem.Categories = [.. enrichmentResult.Categories];
+        float[] embedding = await embeddingsService.GenerateEmbeddingsAsync(todoItem.Description, categories);
+
+        todoItem.Embedding = embedding.ToVector();
+        todoItem.Categories = [.. categories];
+
         todoItem.UpdatedOn = dateTimeProvider.UtcNow;
         
         context.TodoItems.Update(todoItem);

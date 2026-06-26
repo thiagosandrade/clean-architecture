@@ -10,7 +10,6 @@ namespace Application.Todos.Copy;
 
 internal sealed class CopyTodoCommandHandler(
     IApplicationDbContext context,
-    IDateTimeProvider dateTimeProvider,
     IUserContext userContext)
     : ICommandHandler<CopyTodoCommand, Guid>
 {
@@ -43,9 +42,8 @@ internal sealed class CopyTodoCommandHandler(
             Description = existingTodo.Description,
             Priority = existingTodo.Priority,
             DueDate = existingTodo.DueDate,
-            Labels = existingTodo.Labels.ToList(), // Create a new list to avoid reference issues
+            Labels = [.. existingTodo.Labels], // Create a new list to avoid reference issues
             IsCompleted = false, // Reset completion status for the copy
-            CreatedAt = dateTimeProvider.UtcNow
         };
 
         copiedTodoItem.Raise(new TodoItemCreatedDomainEvent(copiedTodoItem.Id));

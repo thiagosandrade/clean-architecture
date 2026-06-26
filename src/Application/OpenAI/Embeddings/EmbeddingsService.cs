@@ -10,13 +10,20 @@ namespace Application.OpenAI.Embeddings;
 
 public class EmbeddingsService(OpenAIClient client, IConfiguration configuration) : IEmbeddingsService
 {
-    public async Task<float[]> GenerateEmbeddingsAsync(string description)
+    public Task<float[]> GenerateEmbeddingsForSearchAsync(string description)
+    {
+        return GenerateEmbeddingsAsync(description, []);
+    }
+
+    public async Task<float[]> GenerateEmbeddingsAsync(string description, IReadOnlyCollection<string> categories)
     {
         string model = configuration["AIConfig:EmbeddingsModel"];
 
         EmbeddingClient embeddingClient = client.GetEmbeddingClient(model);
 
-        ClientResult<OpenAIEmbedding> response = await embeddingClient.GenerateEmbeddingAsync(description);
+        string embeddingText = PromptBuilder.TodoDescription(description, categories);
+
+        ClientResult<OpenAIEmbedding> response = await embeddingClient.GenerateEmbeddingAsync(embeddingText);
 
         float[] vector = response.Value.ToFloats().ToArray();
 
