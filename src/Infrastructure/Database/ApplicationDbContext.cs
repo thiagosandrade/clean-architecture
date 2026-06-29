@@ -16,6 +16,7 @@ public sealed class ApplicationDbContext(
     public DbSet<User> Users { get; set; }
     public DbSet<UserPermission> UserPermissions { get; set; }
     public DbSet<TodoItem> TodoItems { get; set; }
+    public DbSet<TodoSubItem> TodoSubItems { get; set; }
     public DbSet<Permission> Permissions { get; set; }
 
 

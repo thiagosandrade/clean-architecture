@@ -15,10 +15,33 @@ public sealed class TodoItem : Entity
     public DateTime? CompletedAt { get; set; }
     public Priority Priority { get; set; }
     public Vector? Embedding { get; set; } = default!;
-    public IEnumerable<TodoSubItem> SubItems { get; set; } = [];
+    public IEnumerable<TodoSubItem> SubItems => _subItems;
+    
+    private readonly List<TodoSubItem> _subItems = [];
 
     public void AddSubItems(IEnumerable<TodoSubItem> subItems)
     {
-        SubItems = [.. SubItems, .. subItems];
+        _subItems.AddRange([.. SubItems, .. subItems]);
+    }
+
+    public void AddSubItem(TodoSubItem item)
+    {
+        _subItems.Add(item);
+    }
+
+    public void RemoveSubItem(Guid id)
+    {
+        TodoSubItem? item = _subItems
+            .FirstOrDefault(x => x.Id == id);
+
+        if (item is not null)
+        {
+            _subItems.Remove(item);
+        }
+    }
+
+    public TodoSubItem? GetSubItem(Guid id)
+    {
+        return _subItems.FirstOrDefault(x => x.Id == id);
     }
 }

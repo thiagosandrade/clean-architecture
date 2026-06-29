@@ -10,6 +10,7 @@ public interface IApplicationDbContext
     DbSet<User> Users { get; }
     DbSet<UserPermission> UserPermissions { get; }
     DbSet<TodoItem> TodoItems { get; }
+    DbSet<TodoSubItem> TodoSubItems { get; }
     DbSet<Permission> Permissions { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
