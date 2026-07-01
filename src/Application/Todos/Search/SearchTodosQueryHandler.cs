@@ -3,6 +3,7 @@ using Application.Abstractions.Data;
 using Application.Abstractions.Extensions;
 using Application.Abstractions.Messaging;
 using Application.OpenAI.Embeddings;
+using Application.Todos.Get;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Pgvector;
@@ -59,7 +60,16 @@ internal sealed class SearchTodosQueryHandler(
                     IsCompleted = x.Todo.IsCompleted,
                     CreatedAt = x.Todo.CreatedOn,
                     CompletedAt = x.Todo.CompletedAt,
-                    Priority = x.Todo.Priority
+                    Priority = x.Todo.Priority,
+                    SubItems = x.Todo.SubItems.Select(y => new TodoSubItemResponse()
+                    {
+                        CompletedAt = y.CompletedAt,
+                        CreatedAt = y.CreatedOn,
+                        Order = y.Order,
+                        Description = y.Description,
+                        IsCompleted = y.IsCompleted,
+                        TodoItemId = y.TodoItemId
+                    })
                 });
 
 

@@ -26,6 +26,7 @@ internal sealed class GetTodoByIdQueryHandler(IApplicationDbContext context, IUs
                 Priority = todoItem.Priority,
                 CreatedAt = todoItem.CreatedOn,
                 CompletedAt = todoItem.CompletedAt,
+                Categories = todoItem.Categories,
                 SubItems = todoItem.SubItems.OrderBy(x => x.Order).Select(x => new TodoSubItemResponse()
                 {
                     Id  = x.Id,

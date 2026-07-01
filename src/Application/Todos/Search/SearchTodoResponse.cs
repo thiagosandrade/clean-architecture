@@ -6,3 +6,8 @@ public sealed class SearchTodoResponse : TodoResponse
 {
     
 }
+
+public sealed class SearchTodoSubItemResponse : TodoSubItemResponse
+{
+
+}

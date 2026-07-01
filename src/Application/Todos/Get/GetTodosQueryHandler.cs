@@ -32,7 +32,17 @@ internal sealed class GetTodosQueryHandler(IApplicationDbContext context, IUserC
                 IsCompleted = todoItem.IsCompleted,
                 CreatedAt = todoItem.CreatedOn,
                 CompletedAt = todoItem.CompletedAt,
-                Priority = todoItem.Priority
+                Priority = todoItem.Priority,
+                SubItems = todoItem.SubItems.Select(y => new TodoSubItemResponse()
+                {
+                    TodoItemId = y.TodoItemId,
+                    Id = y.Id,
+                    Description = y.Description,
+                    IsCompleted = y.IsCompleted,
+                    Order = y.Order,
+                    CreatedAt = y.CreatedOn,
+                    CompletedAt = y.CompletedAt
+                })
             });
 
         int totalItems = await todos.CountAsync(cancellationToken);
