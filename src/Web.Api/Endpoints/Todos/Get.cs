@@ -1,29 +1,55 @@
 ﻿using Application.Abstractions.Constants;
 using Application.Abstractions.Messaging;
 using Application.Todos.Get;
+using Domain.Todos;
 using SharedKernel;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
 
 namespace Web.Api.Endpoints.Todos;
 
+public sealed class GetTodosRequest
+{
+    public Guid UserId { get; init; }
+
+    public int Page { get; init; } = 1;
+
+    public int Size { get; init; } = 20;
+
+    public string PropertyName { get; init; } = "CreatedAt";
+
+    public bool Descending { get; init; }
+
+    public Priority? Priority { get; init; }
+
+    public DateOnly? DueDateFrom { get; init; }
+    
+    public DateOnly? DueDateTo { get; init; }
+
+    public bool? IsCompleted { get; init; }
+
+}
+
 internal sealed class Get : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet("todos", async (
-            Guid userId,
-            int page,
-            int size,
-            string propertyName,
-            bool descending,
-            IQueryHandler<GetTodosQuery, PagedResponse<TodoResponse>> handler,
+            [AsParameters] GetTodosRequest request,
+            IQueryHandler <GetTodosQuery, PagedResponse<TodoResponse>> handler,
             CancellationToken cancellationToken) =>
         {
             var query = new GetTodosQuery(
-                userId,
-                new Paginated(page, size),
-                new Sorted(propertyName, descending)
+                request.UserId,
+                new Paginated(request.Page, request.Size),
+                new Sorted(request.PropertyName, request.Descending),
+                new TodoFilter
+                {
+                    Priority = request.Priority,
+                    DueDateFrom = request.DueDateFrom,
+                    DueDateTo = request.DueDateTo,
+                    IsCompleted = request.IsCompleted
+                }
             );
 
             Result<PagedResponse<TodoResponse>> result = await handler.Handle(query, cancellationToken);

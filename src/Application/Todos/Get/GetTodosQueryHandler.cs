@@ -45,7 +45,41 @@ internal sealed class GetTodosQueryHandler(IApplicationDbContext context, IUserC
                 })
             });
 
+        //QUERYING
+        if (query.Filter is not null)
+        {
+            if (query.Filter.Priority.HasValue)
+            {
+                todos = todos.Where(x => x.Priority == query.Filter.Priority.Value);
+            }
+
+            if (query.Filter.IsCompleted.HasValue)
+            {
+                todos = todos.Where(x => x.IsCompleted == query.Filter.IsCompleted.Value);
+            }
+
+            if (query.Filter.DueDateFrom.HasValue && query.Filter.DueDateTo.HasValue)
+            {
+                var start = query.Filter.DueDateFrom.Value.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+                var end = query.Filter.DueDateTo.Value.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+                todos = todos.Where(x => x.DueDate >= start && x.DueDate < end);
+            }
+
+            if (query.Filter.DueDateFrom.HasValue && !query.Filter.DueDateTo.HasValue)
+            {
+                var start = query.Filter.DueDateFrom.Value.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+                todos = todos.Where(x => x.DueDate >= start);
+            }
+
+            if (!query.Filter.DueDateFrom.HasValue && query.Filter.DueDateTo.HasValue)
+            {
+                var end = query.Filter.DueDateTo.Value.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+                todos = todos.Where(x => x.DueDate < end);
+            }
+        }
+
         int totalItems = await todos.CountAsync(cancellationToken);
+
 
         // SORTING
         if (query.Sorting is not null)
