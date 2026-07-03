@@ -23,7 +23,7 @@ internal sealed class TodoItemCreatedDomainEventHandler(
 
         IReadOnlyCollection<string> categories = await categoryEnrichmentService.EnrichAsync(todoItem.Description, todoItem.Labels, cancellationToken);
 
-        float[] embedding = await embeddingsService.GenerateEmbeddingsAsync(todoItem.Description, categories);
+        float[] embedding = await embeddingsService.GenerateEmbeddingsAsync(todoItem.Description, [.. todoItem.Labels], categories);
 
         todoItem.Embedding = embedding.ToVector();
         todoItem.Categories = [.. categories];

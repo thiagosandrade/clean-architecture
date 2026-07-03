@@ -9,13 +9,18 @@ public static class PromptBuilder
             Description: "{description}"
             """;
     
-    public static string TodoDescription(string description, IEnumerable<string> categories)
+    public static string TodoDescription(string description, IEnumerable<string> labels, IEnumerable<string> categories)
     {
+        // This is used for embeddings only,  
+        // it does not need to be a valid JSON,
+        // but it should be a structured text that includes the description, labels, and categories.
+
+        string labelsList = string.Join(", ", labels);
         string categoriesList = string.Join(", ", categories);
 
         return $"""
-            Generate a concise description based on the following text and its associated categories. 
             Description: "{description}"
+            Labels: {labelsList}
             Categories: {categoriesList}
             """;
     }

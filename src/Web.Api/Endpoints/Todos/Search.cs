@@ -20,16 +20,23 @@ internal sealed class Search : IEndpoint
             Guid userId,
             int page,
             int size,
-            string propertyName,
-            bool descending,
+            string? propertyName,
+            bool? descending,
             IQueryHandler<SearchTodosQuery, PagedResponse<SearchTodoResponse>> handler,
             CancellationToken cancellationToken) =>
         {
+            Sorted? sorting = null;
+
+            if (!string.IsNullOrWhiteSpace(propertyName))
+            {
+                sorting = new Sorted(propertyName,descending ?? false);
+            }
+
             var query = new SearchTodosQuery(
                 searchtext,
                 userId,
                 new Paginated(page, size),
-                new Sorted(propertyName, descending)
+                sorting
             );
 
             Result<PagedResponse<SearchTodoResponse>> result = await handler.Handle(query, cancellationToken);

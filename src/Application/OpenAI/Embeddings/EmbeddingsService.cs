@@ -12,16 +12,16 @@ public class EmbeddingsService(OpenAIClient client, IConfiguration configuration
 {
     public Task<float[]> GenerateEmbeddingsForSearchAsync(string description)
     {
-        return GenerateEmbeddingsAsync(description, []);
+        return GenerateEmbeddingsAsync(description, [], []);
     }
 
-    public async Task<float[]> GenerateEmbeddingsAsync(string description, IReadOnlyCollection<string> categories)
+    public async Task<float[]> GenerateEmbeddingsAsync(string description, IReadOnlyCollection<string> labels, IReadOnlyCollection<string> categories)
     {
         string model = configuration["AIConfig:EmbeddingsModel"];
 
         EmbeddingClient embeddingClient = client.GetEmbeddingClient(model);
 
-        string embeddingText = PromptBuilder.TodoDescription(description, categories);
+        string embeddingText = PromptBuilder.TodoDescription(description, labels, categories);
 
         ClientResult<OpenAIEmbedding> response = await embeddingClient.GenerateEmbeddingAsync(embeddingText);
 
