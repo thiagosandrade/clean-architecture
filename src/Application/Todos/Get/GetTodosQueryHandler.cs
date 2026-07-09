@@ -33,7 +33,7 @@ internal sealed class GetTodosQueryHandler(IApplicationDbContext context, IUserC
                 CreatedAt = todoItem.CreatedOn,
                 CompletedAt = todoItem.CompletedAt,
                 Priority = todoItem.Priority,
-                SubItems = todoItem.SubItems.Select(y => new TodoSubItemResponse()
+                Subtasks = todoItem.SubItems.Select(y => new TodoSubtaskResponse()
                 {
                     TodoItemId = y.TodoItemId,
                     Id = y.Id,

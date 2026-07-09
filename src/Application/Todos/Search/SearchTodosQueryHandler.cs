@@ -62,7 +62,7 @@ internal sealed class SearchTodosQueryHandler(
                     CompletedAt = x.Todo.CompletedAt,
                     Priority = x.Todo.Priority,
                     Similarity = 1 - x.Distance,
-                    SubItems = x.Todo.SubItems.Select(y => new TodoSubItemResponse()
+                    Subtasks = x.Todo.SubItems.Select(y => new TodoSubtaskResponse()
                     {
                         CompletedAt = y.CompletedAt,
                         CreatedAt = y.CreatedOn,

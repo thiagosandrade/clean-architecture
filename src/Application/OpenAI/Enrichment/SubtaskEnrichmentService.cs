@@ -1,5 +1,6 @@
 ﻿using System.ClientModel;
 using System.Text.Json;
+using Application.Todos.Breakdown;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using OpenAI;
@@ -11,6 +12,8 @@ internal sealed class SubTaskEnrichmentService(OpenAIClient client, IConfigurati
 {
     public async Task<IReadOnlyCollection<string>> GenerateSubTasksAsync(
         string description,
+        BreakdownStrategy strategy, 
+        BreakdownComplexity complexity,
         CancellationToken cancellationToken = default)
     {
         string model = configuration["AIConfig:ChatModel"];
@@ -20,7 +23,7 @@ internal sealed class SubTaskEnrichmentService(OpenAIClient client, IConfigurati
         List<ChatMessage> messages =
         [
             new SystemChatMessage(
-                """
+                $"""
                 You are a productivity assistant.
 
                 Break TODOs into actionable subtasks.
@@ -28,6 +31,8 @@ internal sealed class SubTaskEnrichmentService(OpenAIClient client, IConfigurati
                 Rules:
                 - Return between 3 and 8 subtasks.
                 - Keep each subtask under 80 characters.
+                - Respect the strategy {strategy}.
+                - Respect the complexity {complexity}.
                 - Preserve execution order.
                 - Do not repeat the original task.
                 - Return JSON only.

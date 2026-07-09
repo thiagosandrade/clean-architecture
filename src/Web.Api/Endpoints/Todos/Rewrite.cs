@@ -3,38 +3,41 @@ using Application.Abstractions.Constants;
 using Application.Abstractions.Messaging;
 using Application.Todos.Breakdown;
 using Application.Todos.Complete;
+using Application.Todos.Rewrite;
 using SharedKernel;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
 
 namespace Web.Api.Endpoints.Todos;
 
-internal sealed class Breakdown : IEndpoint
+internal sealed class Rewrite : IEndpoint
 {
-    public sealed class Request
+    public sealed record Request
     {
-        public Guid UserId { get; set; }
-        public BreakdownComplexity Complexity { get; set; }
-        public BreakdownStrategy Strategy { get; set; }
+        public Guid UserId { get; init; }
+
+        public string Description { get; init; } = string.Empty;
+
+        public RewriteStyle Style { get; init; }
     }
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPut("todos/ai/{id:guid}/breakdown", async (
+        app.MapPut("todos/ai/{id:guid}/rewrite", async (
             Guid id,
             Request request,
-            ICommandHandler<TaskBreakdownCommand, BreakdownResponse> handler,
+            ICommandHandler<SubtaskRewriteCommand, SubtaskRewriteResponse> handler,
             CancellationToken cancellationToken) =>
         {
-            var command = new TaskBreakdownCommand()
+            var command = new SubtaskRewriteCommand()
             {
-                UserId = request.UserId,
                 TodoId = id,
-                Complexity = request.Complexity,
-                Strategy = request.Strategy
+                UserId = request.UserId,
+                Description = request.Description,
+                Style = request.Style
             };
 
-            Result<BreakdownResponse> result = await handler.Handle(command, cancellationToken);
+            Result<SubtaskRewriteResponse> result = await handler.Handle(command, cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })

@@ -1,6 +1,6 @@
 ﻿namespace Application.Todos.Get;
 
-public class TodoSubItemResponse
+public class TodoSubtaskResponse
 {
     public Guid Id { get; set; }
 

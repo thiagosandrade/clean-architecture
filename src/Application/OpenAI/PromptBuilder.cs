@@ -2,6 +2,21 @@
 
 public static class PromptBuilder
 {
+    public static string SubtaskRewrite(string description, string style) =>
+        $$"""
+            Rewrite the following TODO using a style
+
+            Style: {{style}}
+
+            Rules:
+            - Preserve the meaning.
+            - Do not add new requirements.
+            - Return the description rewritten as a JSON object with a single property "Description" which is a string.
+
+            TODO:
+            {{description}}
+            """;
+
     public static string TodoCategories(string description) =>
         $"""
             Categorize the following description into a list of relevant categories. 

@@ -9,17 +9,17 @@ using SharedKernel;
 
 namespace Application.Todos.Breakdown;
 
-internal sealed class TaskBreakdownCommandHandler(
+internal sealed partial class TaskBreakdownCommandHandler(
     IApplicationDbContext context,
     ISubTaskEnrichmentService subTaskEnrichmentService,
     IUserContext userContext)
-    : ICommandHandler<TaskBreakdownCommand>
+    : ICommandHandler<TaskBreakdownCommand, BreakdownResponse>
 {
-    public async Task<Result> Handle(TaskBreakdownCommand  command, CancellationToken cancellationToken)
+    public async Task<Result<BreakdownResponse>> Handle(TaskBreakdownCommand command, CancellationToken cancellationToken)
     {
         if (userContext.UserId != command.UserId)
         {
-            return Result.Failure<Guid>(UserErrors.Unauthorized());
+            return Result.Failure<BreakdownResponse>(UserErrors.Unauthorized());
         }
 
         User? user = await context.Users.AsNoTracking()
@@ -27,30 +27,15 @@ internal sealed class TaskBreakdownCommandHandler(
 
         if (user is null)
         {
-            return Result.Failure<Guid>(UserErrors.NotFound(command.UserId));
+            return Result.Failure<BreakdownResponse>(UserErrors.NotFound(command.UserId));
         }
 
         TodoItem todo = await context.TodoItems
             .Include(x => x.SubItems)
             .FirstAsync(x => x.Id == command.TodoId, cancellationToken);
 
-        if (todo.SubItems.Any())
-        {
-            return Result.Failure(SubTaskErrors.AlreadyGenerated(command.TodoId));
-        }
+        IReadOnlyCollection<string> subTasks = await subTaskEnrichmentService.GenerateSubTasksAsync(todo.Description, command.Strategy, command.Complexity, cancellationToken);
 
-        IReadOnlyCollection<string> subTasks = await subTaskEnrichmentService.GenerateSubTasksAsync(todo.Description, cancellationToken);
-
-        todo.AddSubItems([.. subTasks
-            .Select((description, index) => new TodoSubItem
-            {
-                Description = description,
-                TodoItemId = todo.Id,
-                Order = index
-            })]);
-
-        await context.SaveChangesAsync(cancellationToken);
-
-        return Result.Success();
+        return new BreakdownResponse(subTasks);
     }
 }
