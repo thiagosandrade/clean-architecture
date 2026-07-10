@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions.Data;
 using Application.Abstractions.Extensions;
 using Application.OpenAI.Enrichment;
+using Domain.Activities;
 using Domain.Todos;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,8 @@ internal sealed class TodoItemEditedDomainEventHandler(
         todoItem.UpdatedOn = dateTimeProvider.UtcNow;
 
         context.TodoItems.Update(todoItem);
+
+        todoItem.Raise(new TaskActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.CategoriesGenerated, "Categories Generated", todoItem.UserId));
 
         await context.SaveChangesAsync(cancellationToken);
 

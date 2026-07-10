@@ -1,4 +1,5 @@
-﻿using Pgvector;
+﻿using Domain.Activities;
+using Pgvector;
 using SharedKernel;
 
 namespace Domain.Todos;
@@ -16,7 +17,8 @@ public sealed class TodoItem : Entity
     public Priority Priority { get; set; }
     public Vector? Embedding { get; set; } = default!;
     public IEnumerable<TodoSubItem> SubItems => _subItems;
-    
+    public IEnumerable<TaskActivity> TaskActivities { get; set; } = [];
+
     private readonly List<TodoSubItem> _subItems = [];
 
     public void AddSubItems(IEnumerable<TodoSubItem> subItems)

@@ -1,4 +1,5 @@
-﻿using Domain.Permissions;
+﻿using Domain.Activities;
+using Domain.Permissions;
 using Domain.Todos;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ public interface IApplicationDbContext
     DbSet<TodoItem> TodoItems { get; }
     DbSet<TodoSubItem> TodoSubItems { get; }
     DbSet<Permission> Permissions { get; }
+    DbSet<TaskActivity> TaskActivities { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

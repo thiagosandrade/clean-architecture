@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
+using Domain.Activities;
 using Domain.Todos;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
@@ -40,9 +41,11 @@ internal sealed class CreateTodoCommandHandler(
 
         context.TodoItems.Add(todoItem);
 
-        todoItem.Raise(new TodoItemCreatedDomainEvent(todoItem.Id));
-
         await context.SaveChangesAsync(cancellationToken);
+
+        todoItem.Raise(new TodoItemCreatedDomainEvent(todoItem.Id));
+        
+        todoItem.Raise(new TaskActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.TaskCreated, "Task Created", user.Id));
         
         return todoItem.Id;
     }

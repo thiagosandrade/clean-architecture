@@ -3,6 +3,7 @@ using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.OpenAI.Enrichment;
 using Application.Todos.Breakdown;
+using Domain.Activities;
 using Domain.Todos;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
@@ -31,7 +32,17 @@ internal sealed class SubtaskRewriteCommandHander(
             return Result.Failure<SubtaskRewriteResponse>(UserErrors.NotFound(command.UserId));
         }
 
+        TodoItem? todoItem = await context.TodoItems
+            .SingleOrDefaultAsync(t => t.Id == command.TodoId && t.UserId == userContext.UserId, cancellationToken);
+
+        if (todoItem is null)
+        {
+            return Result.Failure<SubtaskRewriteResponse>(TodoItemErrors.NotFound(command.TodoId));
+        }
+
         SubtaskRewriteResponse response = await subtaskRewriteService.RewriteAsync(command.Description, command.Style, cancellationToken);
+
+        todoItem.Raise(new TaskActivityLogRequestedDomainEvent(command.TodoId, TaskActivityType.DescriptionRewritten, "Description Rewritten but not saved yet", user.Id));
 
         return Result.Success<SubtaskRewriteResponse>(response);
     }

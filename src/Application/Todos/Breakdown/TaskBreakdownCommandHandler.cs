@@ -2,6 +2,7 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.OpenAI.Enrichment;
+using Domain.Activities;
 using Domain.Todos;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
@@ -30,11 +31,13 @@ internal sealed partial class TaskBreakdownCommandHandler(
             return Result.Failure<BreakdownResponse>(UserErrors.NotFound(command.UserId));
         }
 
-        TodoItem todo = await context.TodoItems
+        TodoItem todoItem = await context.TodoItems
             .Include(x => x.SubItems)
             .FirstAsync(x => x.Id == command.TodoId, cancellationToken);
 
-        IReadOnlyCollection<string> subTasks = await subTaskEnrichmentService.GenerateSubTasksAsync(todo.Description, command.Strategy, command.Complexity, cancellationToken);
+        IReadOnlyCollection<string> subTasks = await subTaskEnrichmentService.GenerateSubTasksAsync(todoItem.Description, command.Strategy, command.Complexity, cancellationToken);
+
+        todoItem.Raise(new TaskActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.BreakdownGenerated, "BreakdownGenerated", todoItem.UserId));
 
         return new BreakdownResponse(subTasks);
     }

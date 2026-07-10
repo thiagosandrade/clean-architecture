@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
+using Domain.Activities;
 using Domain.Todos;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
@@ -62,8 +63,10 @@ internal sealed class EditTodoCommandHandler(
             todoItem.Raise(new TodoItemEditedDomainEvent(todoItem.Id));
         }
 
+        todoItem.Raise(new TaskActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.TaskUpdated, "Task Updated", user.Id));
+
         await context.SaveChangesAsync(cancellationToken);
-        
+
         return todoItem.Id;
     }
 }

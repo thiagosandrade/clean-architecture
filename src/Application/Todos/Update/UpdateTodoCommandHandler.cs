@@ -1,6 +1,8 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
+using Domain.Activities;
 using Domain.Todos;
+using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
@@ -23,8 +25,10 @@ internal sealed class UpdateTodoCommandHandler(
         todoItem.Description = command.Description;
         todoItem.UpdatedOn = dateTimeProvider.UtcNow;
 
+        todoItem.Raise(new TaskActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.TaskUpdated, "Subtask Updated", todoItem.UserId));
+
         await context.SaveChangesAsync(cancellationToken);
-        
+
         return Result.Success();
     }
 }

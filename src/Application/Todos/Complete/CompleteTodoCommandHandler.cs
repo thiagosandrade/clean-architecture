@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
+using Domain.Activities;
 using Domain.Todos;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
@@ -32,6 +33,8 @@ internal sealed class CompleteTodoCommandHandler(
         todoItem.CompletedAt = dateTimeProvider.UtcNow;
 
         todoItem.Raise(new TodoItemCompletedDomainEvent(todoItem.Id));
+
+        todoItem.Raise(new TaskActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.TaskCompleted, "Task Completed", todoItem.UserId));
 
         await context.SaveChangesAsync(cancellationToken);
 

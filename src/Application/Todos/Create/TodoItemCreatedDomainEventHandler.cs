@@ -3,6 +3,7 @@ using Application.Abstractions.Extensions;
 using Application.OpenAI;
 using Application.OpenAI.Embeddings;
 using Application.OpenAI.Enrichment;
+using Domain.Activities;
 using Domain.Todos;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +32,8 @@ internal sealed class TodoItemCreatedDomainEventHandler(
         todoItem.UpdatedOn = dateTimeProvider.UtcNow;
         
         context.TodoItems.Update(todoItem);
+
+        todoItem.Raise(new TaskActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.EmbeddingsGenerated, "Embeddings Generated", todoItem.UserId));
 
         await context.SaveChangesAsync(cancellationToken);
 

@@ -32,6 +32,11 @@ internal sealed class PermissionConfiguration : IEntityTypeConfiguration<Permiss
             {
                 Id = PermissionsConstants.PermissionAccessId,
                 Description = PermissionsConstants.PermissionAccess
+            },
+            new Permission
+            {
+                Id = PermissionsConstants.ActivityAccessId,
+                Description = PermissionsConstants.ActivityAccess
             }
         );
     }

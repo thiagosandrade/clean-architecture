@@ -3,6 +3,7 @@ using Application.Abstractions.Messaging;
 using Application.OpenAI.Embeddings;
 using Application.OpenAI.Enrichment;
 using Application.OpenAI.Parser;
+using Application.TaskActivities.Log;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,6 +46,7 @@ public static class DependencyInjection
         services.AddScoped<IParseTodoEnrichmentService, ParseTodoEnrichmentService>();
         services.AddScoped<ISubTaskEnrichmentService, SubTaskEnrichmentService>();
         services.AddScoped<IRewriteEnrichmentService, RewriteEnrichmentService>();
+        services.AddScoped<ITaskActivityService, TaskActivityService>();
 
         // OpenAI
         services.AddSingleton(new OpenAIClient(
