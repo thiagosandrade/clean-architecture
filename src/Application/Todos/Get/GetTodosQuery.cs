@@ -2,7 +2,7 @@
 using Domain.Todos;
 using SharedKernel;
 
-namespace Application.Todos.Get;
+namespace Application.Todos.GetByDescription;
 
 public sealed record GetTodosQuery(Guid UserId, Paginated? Pagination, Sorted? Sorting, TodoFilter? Filter) 
     : IQuery<PagedResponse<TodoResponse>>;

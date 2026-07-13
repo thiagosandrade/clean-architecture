@@ -1,6 +1,6 @@
 ﻿using Application.Abstractions.Constants;
 using Application.Abstractions.Messaging;
-using Application.Todos.Get;
+using Application.Todos.GetByDescription;
 using Application.Todos.Search;
 using Domain.Users;
 using Microsoft.AspNetCore.Mvc.RazorPages;

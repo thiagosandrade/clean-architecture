@@ -3,7 +3,7 @@ using Application.Abstractions.Data;
 using Application.Abstractions.Extensions;
 using Application.Abstractions.Messaging;
 using Application.OpenAI.Embeddings;
-using Application.Todos.Get;
+using Application.Todos.GetByDescription;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Pgvector;

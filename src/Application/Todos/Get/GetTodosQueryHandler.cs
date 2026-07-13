@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 using System.Linq.Dynamic.Core;
 
-namespace Application.Todos.Get;
+namespace Application.Todos.GetByDescription;
 
 internal sealed class GetTodosQueryHandler(IApplicationDbContext context, IUserContext userContext)
     : IQueryHandler<GetTodosQuery, PagedResponse<TodoResponse>>

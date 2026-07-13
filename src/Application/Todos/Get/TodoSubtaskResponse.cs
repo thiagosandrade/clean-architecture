@@ -1,4 +1,4 @@
-﻿namespace Application.Todos.Get;
+﻿namespace Application.Todos.GetByDescription;
 
 public class TodoSubtaskResponse
 {

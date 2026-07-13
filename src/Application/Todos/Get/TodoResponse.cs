@@ -1,7 +1,7 @@
 ﻿using Application.Todos.GetById;
 using Domain.Todos;
 
-namespace Application.Todos.Get;
+namespace Application.Todos.GetByDescription;
 
 public class TodoResponse
 {

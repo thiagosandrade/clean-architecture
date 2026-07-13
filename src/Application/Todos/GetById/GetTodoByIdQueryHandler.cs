@@ -12,7 +12,9 @@ internal sealed class GetTodoByIdQueryHandler(IApplicationDbContext context, IUs
 {
     public async Task<Result<TodoResponse>> Handle(GetTodoByIdQuery query, CancellationToken cancellationToken)
     {
-        TodoResponse? todo = await context.TodoItems.Include(x => x.SubItems)
+        TodoResponse? todo = await context.TodoItems
+            .Include(x => x.SubItems)
+            .Include(x => x.Dependencies)
             .AsNoTracking()
             .Where(todoItem => todoItem.Id == query.TodoItemId && todoItem.UserId == userContext.UserId)
             .Select(todoItem => new TodoResponse
@@ -36,6 +38,12 @@ internal sealed class GetTodoByIdQueryHandler(IApplicationDbContext context, IUs
                     CompletedAt = x.CompletedAt,
                     IsCompleted = x.IsCompleted,
                     Order = x.Order
+                }),
+                Dependencies = todoItem.Dependencies.Select(x => new TaskDependencyResponse()
+                {
+                    TodoItemId = x.TodoItemId,
+                    DependsOnTodoItemId = x.DependsOnTodoItemId,
+                    Description = x.DependsOnTodoItem.Description
                 })
             })
             .SingleOrDefaultAsync(cancellationToken);

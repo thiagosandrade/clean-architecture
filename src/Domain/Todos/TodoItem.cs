@@ -16,10 +16,15 @@ public sealed class TodoItem : Entity
     public DateTime? CompletedAt { get; set; }
     public Priority Priority { get; set; }
     public Vector? Embedding { get; set; } = default!;
-    public IEnumerable<TodoSubItem> SubItems => _subItems;
+    
     public IEnumerable<TaskActivity> TaskActivities { get; set; } = [];
 
     private readonly List<TodoSubItem> _subItems = [];
+    public IEnumerable<TodoSubItem> SubItems => _subItems;
+
+
+    private readonly List<TaskDependency> _dependencies = [];
+    public IEnumerable<TaskDependency> Dependencies => _dependencies;
 
     public void AddSubItems(IEnumerable<TodoSubItem> subItems)
     {
@@ -45,5 +50,29 @@ public sealed class TodoItem : Entity
     public TodoSubItem? GetSubItem(Guid id)
     {
         return _subItems.FirstOrDefault(x => x.Id == id);
+    }
+
+    public void AddDependency(Guid dependsOnId)
+    {
+        if (_dependencies.Any(x =>
+            x.DependsOnTodoItemId == dependsOnId))
+        {
+            return;
+        }
+
+        _dependencies.Add(
+            new TaskDependency(Id, dependsOnId));
+    }
+
+    public void RemoveDependency(Guid dependsOnId)
+    {
+        TaskDependency? dependency =
+            _dependencies.FirstOrDefault(
+                x => x.DependsOnTodoItemId == dependsOnId);
+
+        if (dependency != null)
+        {
+            _dependencies.Remove(dependency);
+        }
     }
 }
