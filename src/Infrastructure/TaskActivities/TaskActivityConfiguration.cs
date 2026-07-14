@@ -12,8 +12,6 @@ public sealed class TodoActivityConfiguration
 {
     public void Configure(EntityTypeBuilder<TaskActivity> builder)
     {
-        builder.ToTable("TaskActivities");
-
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Description)
