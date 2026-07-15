@@ -11,6 +11,10 @@ public static class TodoItemErrors
     public static Error NotFound(Guid todoItemId) => Error.NotFound(
         "TodoItemErrors.NotFound",
         $"The to-do item with the Id = '{todoItemId}' was not found");
+
+    public static Error AttachmentNotFound(Guid attachmentId) => Error.NotFound(
+        "TodoItemErrors.AttachmentNotFound",
+        $"The attachment with Id = '{attachmentId}' was not found");
 }
 
 public static class SubTaskErrors

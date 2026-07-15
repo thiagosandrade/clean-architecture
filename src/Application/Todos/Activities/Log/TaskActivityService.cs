@@ -6,7 +6,7 @@ using Application.Abstractions.Data;
 using Domain.Activities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.TaskActivities.Log;
+namespace Application.Todos.Activities.Log;
 
 public class TaskActivityService(IApplicationDbContext applicationDbContext) : ITaskActivityService
 {

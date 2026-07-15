@@ -2,7 +2,7 @@
 using Domain.Activities;
 using Domain.Todos;
 
-namespace Application.TaskActivities.Get;
+namespace Application.Todos.Activities.Get;
 
 public class GetTaskActivityResponse
 {

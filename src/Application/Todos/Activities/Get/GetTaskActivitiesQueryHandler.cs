@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 using System.Linq.Dynamic.Core;
 
-namespace Application.TaskActivities.Get;
+namespace Application.Todos.Activities.Get;
 
 internal sealed class GetTaskActivitiesQueryHandler(IApplicationDbContext context, IUserContext userContext)
     : IQueryHandler<GetTaskActivitiesQuery, GetTaskActivityResponse>

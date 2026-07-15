@@ -21,6 +21,7 @@ public sealed class ApplicationDbContext(
     public DbSet<Permission> Permissions { get; set; }
     public DbSet<TaskActivity> TaskActivities { get; set; }
     public DbSet<TaskDependency> TaskDependencies { get; set; }
+    public DbSet<TaskAttachment> TaskAttachments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

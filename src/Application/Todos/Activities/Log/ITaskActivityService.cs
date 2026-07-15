@@ -1,6 +1,6 @@
 ﻿using Domain.Activities;
 
-namespace Application.TaskActivities.Log;
+namespace Application.Todos.Activities.Log;
 
 public interface ITaskActivityService
 {

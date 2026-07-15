@@ -15,6 +15,7 @@ public interface IApplicationDbContext
     DbSet<Permission> Permissions { get; }
     DbSet<TaskActivity> TaskActivities { get; }
     DbSet<TaskDependency> TaskDependencies { get; }
+    DbSet<TaskAttachment> TaskAttachments { get; set; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

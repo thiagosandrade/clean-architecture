@@ -26,6 +26,10 @@ public sealed class TodoItem : Entity
     private readonly List<TaskDependency> _dependencies = [];
     public IEnumerable<TaskDependency> Dependencies => _dependencies;
 
+
+    private readonly List<TaskAttachment> _attachments = [];
+    public IEnumerable<TaskAttachment> Attachments => _attachments;
+
     public void AddSubItems(IEnumerable<TodoSubItem> subItems)
     {
         _subItems.AddRange([.. SubItems, .. subItems]);
@@ -73,6 +77,23 @@ public sealed class TodoItem : Entity
         if (dependency != null)
         {
             _dependencies.Remove(dependency);
+        }
+    }
+
+    public void AddAttachment(TaskAttachment taskAttachment)
+    {
+        _attachments.Add(taskAttachment);
+    }
+
+    public void RemoveAttachment(Guid taskAttachmentId)
+    {
+        TaskAttachment? attachment =
+            _attachments.FirstOrDefault(
+                x => x.Id == taskAttachmentId);
+
+        if (attachment != null)
+        {
+            _attachments.Remove(attachment);
         }
     }
 }

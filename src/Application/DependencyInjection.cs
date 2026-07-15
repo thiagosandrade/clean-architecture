@@ -3,7 +3,7 @@ using Application.Abstractions.Messaging;
 using Application.OpenAI.Embeddings;
 using Application.OpenAI.Enrichment;
 using Application.OpenAI.Parser;
-using Application.TaskActivities.Log;
+using Application.Todos.Activities.Log;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

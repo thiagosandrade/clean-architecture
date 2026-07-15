@@ -32,5 +32,7 @@ public enum TaskActivityType
 
     CategoriesGenerated = 14,
 
-    DependencyUpdated = 15
+    DependencyUpdated = 15,
+
+    AttachmentDeleted = 16,
 }

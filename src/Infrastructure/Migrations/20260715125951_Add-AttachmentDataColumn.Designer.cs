@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pgvector;
@@ -12,9 +13,11 @@ using Pgvector;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260715125951_Add-AttachmentDataColumn")]
+    partial class AddAttachmentDataColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -447,16 +450,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Domain.Todos.TaskAttachment", b =>
-                {
-                    b.HasOne("Domain.Todos.TodoItem", null)
-                        .WithMany("Attachments")
-                        .HasForeignKey("TodoItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_task_attachments_todo_items_todo_item_id");
-                });
-
             modelBuilder.Entity("Domain.Todos.TaskDependency", b =>
                 {
                     b.HasOne("Domain.Todos.TodoItem", "DependsOnTodoItem")
@@ -519,8 +512,6 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Todos.TodoItem", b =>
                 {
-                    b.Navigation("Attachments");
-
                     b.Navigation("Dependencies");
 
                     b.Navigation("SubItems");
