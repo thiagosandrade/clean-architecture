@@ -28,7 +28,7 @@ app.UseCors();
 
 app.MapEndpoints();
 
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Docker"))
 {
     app.UseSwaggerWithUi();
 
@@ -49,6 +49,8 @@ app.UseExceptionHandler();
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.UseHttpsRedirection();
 
 // REMARK: If you want to use Controllers, you'll need this.
 app.MapControllers();

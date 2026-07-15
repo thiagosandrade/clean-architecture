@@ -1,4 +1,10 @@
 <Solution>
+  <Folder Name="/docker/">
+    <Project Path="src/Docker/docker-compose.dcproj" Id="34bb3069-d5d0-4046-acad-a2025ed7678f">
+      <BuildType Project="Debug" />
+      <Build />
+    </Project>
+  </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
     <File Path="Directory.Build.props" />
@@ -14,7 +20,4 @@
   <Folder Name="/tests/">
     <Project Path="tests/ArchitectureTests/ArchitectureTests.csproj" />
   </Folder>
-  <Project Path="docker-compose.dcproj">
-    <Build />
-  </Project>
 </Solution>

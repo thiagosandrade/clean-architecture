@@ -2,9 +2,10 @@
   "profiles": {
     "Docker Compose": {
       "commandName": "DockerCompose",
+      "commandLineArgs": "-f docker-compose.yml -f docker-compose.override.yml",
       "commandVersion": "1.0",
       "serviceActions": {
-        "web.api": "StartDebugging"
+        "web-api": "StartDebugging"
       }
     }
   }
