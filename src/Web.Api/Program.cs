@@ -35,6 +35,11 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Docker"))
     app.ApplyMigrations();
 }
 
+if (app.Environment.IsEnvironment("Docker"))
+{
+    app.UseHttpsRedirection();
+}
+
 app.MapHealthChecks("health", new HealthCheckOptions
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
@@ -49,8 +54,6 @@ app.UseExceptionHandler();
 app.UseAuthentication();
 
 app.UseAuthorization();
-
-app.UseHttpsRedirection();
 
 // REMARK: If you want to use Controllers, you'll need this.
 app.MapControllers();
