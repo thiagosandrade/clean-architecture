@@ -22,7 +22,7 @@ internal sealed class GetAllQueryHandler(IApplicationDbContext context)
                 Email = u.Email,
                 CreatedOn = u.CreatedOn,
                 Permissions = u.UserPermissions
-                               .Select(p => new PermissionResponse { Id = p.Id, UserId = p.UserId, Description = p.Permission.Description})
+                               .Select(p => new PermissionResponse { Id = p.Id, PermissionId = p.PermissionId, UserId = p.UserId, Description = p.Permission.Description})
                                .ToList()
             })
             .ToListAsync(cancellationToken);

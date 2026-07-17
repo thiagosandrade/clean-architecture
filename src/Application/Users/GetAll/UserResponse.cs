@@ -18,6 +18,7 @@ public sealed record UserResponse
 public sealed record PermissionResponse
 {
     public Guid Id { get; set; }
+    public Guid PermissionId { get; set; }
     public Guid UserId { get; set; }
     public string Description { get; set; }
 }
