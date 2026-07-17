@@ -13,9 +13,9 @@ internal sealed class TodoSubItemConfiguration : IEntityTypeConfiguration<TodoSu
     {
         builder.HasKey(t => t.Id);
 
-        builder.HasOne<TodoItem>()
-            .WithMany(t => t.SubItems)
-            .HasForeignKey(t => t.TodoItemId)
+        builder.HasOne(x => x.TodoItem)
+            .WithMany(x => x.SubItems)
+            .HasForeignKey(x => x.TodoItemId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property(x => x.CreatedOn)

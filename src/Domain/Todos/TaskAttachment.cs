@@ -20,4 +20,6 @@ public sealed class TaskAttachment : Entity
 
     // Binary content of the uploaded file
     public byte[] Data { get; set; } = [];
+
+    public TodoItem TodoItem { get; private set; } = null!;
 }

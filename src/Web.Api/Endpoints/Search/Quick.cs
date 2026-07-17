@@ -1,0 +1,33 @@
+using Application.Abstractions.Messaging;
+using Application.Search;
+using Web.Api.Extensions;
+using Web.Api.Infrastructure;
+using SharedKernel;
+
+namespace Web.Api.Endpoints.Search;
+
+public sealed class QuickSearchRequest
+{
+    public Guid UserId { get; init; }
+    public string Text { get; init; }
+    public int Limit { get; init; } = 5;
+}
+
+internal sealed class Quick : IEndpoint
+{
+    public void MapEndpoint(IEndpointRouteBuilder app)
+    {
+        app.MapGet("search/quick", async (
+            [AsParameters] QuickSearchRequest request,
+            IQueryHandler<QuickSearchQuery, QuickSearchResponse> handler,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new QuickSearchQuery(request.UserId, request.Text, request.Limit);
+
+            Result<QuickSearchResponse> result = await handler.Handle(query, cancellationToken);
+
+            return result.Match(Results.Ok, CustomResults.Problem);
+        })
+        .WithTags(Tags.Search);
+    }
+}

@@ -19,4 +19,6 @@ public class TodoSubItem : Entity
     public DateTime? CompletedAt { get; set; }
 
     public int Order { get; set; }
+
+    public TodoItem TodoItem { get; private set; } = null!;
 }
