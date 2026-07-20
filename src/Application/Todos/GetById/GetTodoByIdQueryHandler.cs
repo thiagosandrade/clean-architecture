@@ -29,7 +29,7 @@ internal sealed class GetTodoByIdQueryHandler(IApplicationDbContext context, IUs
                 CreatedAt = todoItem.CreatedOn,
                 CompletedAt = todoItem.CompletedAt,
                 Categories = todoItem.Categories,
-                Subtasks = todoItem.SubItems.OrderBy(x => x.Order).Select(x => new TodoSubItemResponse()
+                SubItems = todoItem.SubItems.OrderBy(x => x.Order).Select(x => new TodoSubItemResponse()
                 {
                     Id  = x.Id,
                     TodoItemId = x.TodoItemId,

@@ -24,14 +24,14 @@ internal sealed class GetQuickSearchQueryHandler(
         string pattern = $"%{query.Text}%";
         int limit = query.Limit <= 0 ? 5 : query.Limit;
 
-        List<TaskSearchItem> tasks = await context.TodoItems
+        List<TodoItemSearch> todoItem = await context.TodoItems
             .AsNoTracking()
             .Where(t =>
                 t.UserId == query.UserId &&
                 EF.Functions.ILike(t.Description, pattern))
             .OrderByDescending(t => t.UpdatedOn ?? t.CreatedOn)
             .Take(limit)
-            .Select(t => new TaskSearchItem
+            .Select(t => new TodoItemSearch
             {
                 Id = t.Id,
                 Description = t.Description,
@@ -41,14 +41,14 @@ internal sealed class GetQuickSearchQueryHandler(
             })
             .ToListAsync(cancellationToken);
 
-        List<SubtaskSearchItem> subtasks = await context.TodoSubItems
+        List<TodoSubItemSearch> subtasks = await context.TodoSubItems
             .AsNoTracking()
             .Where(s =>
                 s.TodoItem.UserId == query.UserId &&
                 EF.Functions.ILike(s.Description, pattern))
             .OrderByDescending(s => s.TodoItem.UpdatedOn ?? s.TodoItem.CreatedOn)
             .Take(limit)
-            .Select(s => new SubtaskSearchItem
+            .Select(s => new TodoSubItemSearch
             {
                 Id = s.Id,
                 Description = s.Description,
@@ -58,14 +58,14 @@ internal sealed class GetQuickSearchQueryHandler(
             })
             .ToListAsync(cancellationToken);
 
-        List<AttachmentSearchItem> attachments = await context.TodoAttachments
+        List<TodoItemAttachmentSearch> attachments = await context.TodoAttachments
             .AsNoTracking()
             .Where(a =>
                 a.TodoItem.UserId == query.UserId &&
                 EF.Functions.ILike(a.OriginalFileName, pattern))
             .OrderByDescending(a => a.TodoItem.UpdatedOn ?? a.TodoItem.CreatedOn)
             .Take(limit)
-            .Select(a => new AttachmentSearchItem
+            .Select(a => new TodoItemAttachmentSearch
             {
                 Id = a.Id,
                 OriginalFileName = a.OriginalFileName,
@@ -76,7 +76,7 @@ internal sealed class GetQuickSearchQueryHandler(
             })
             .ToListAsync(cancellationToken);
 
-        List<UserSearchItem> users = await context.Users
+        List<UserItemSearch> users = await context.Users
             .AsNoTracking()
             .Where(u =>
                 EF.Functions.ILike(u.Email, pattern) ||
@@ -84,7 +84,7 @@ internal sealed class GetQuickSearchQueryHandler(
                 EF.Functions.ILike(u.LastName, pattern))
             .OrderBy(u => u.Email)
             .Take(limit)
-            .Select(u => new UserSearchItem
+            .Select(u => new UserItemSearch
             {
                 Id = u.Id,
                 DisplayName = $"{u.FirstName} {u.LastName}",
@@ -94,7 +94,7 @@ internal sealed class GetQuickSearchQueryHandler(
 
         return new QuickSearchResponse
         {
-            Tasks = tasks,
+            Tasks = todoItem,
             Subtasks = subtasks,
             Attachments = attachments,
             Users = users

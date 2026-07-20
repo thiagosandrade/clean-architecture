@@ -9,8 +9,8 @@ public sealed record SearchQuery(Guid UserId, string Text, int Page = 1, int Pag
 
 public sealed class SearchResponse
 {
-    public List<TaskSearchItem> Tasks { get; init; } = [];
-    public List<SubtaskSearchItem> Subtasks { get; init; } = [];
-    public List<AttachmentSearchItem> Attachments { get; init; } = [];
-    public List<UserSearchItem> Users { get; init; } = [];
+    public List<TodoItemSearch> Tasks { get; init; } = [];
+    public List<TodoSubItemSearch> Subtasks { get; init; } = [];
+    public List<TodoItemAttachmentSearch> Attachments { get; init; } = [];
+    public List<UserItemSearch> Users { get; init; } = [];
 }

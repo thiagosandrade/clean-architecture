@@ -26,13 +26,13 @@ internal sealed class GetSearchQueryHandler(IApplicationDbContext context, IUser
         int skip = (Math.Max(query.Page, 1) - 1) * Math.Max(query.PageSize, 1);
         int take = Math.Max(query.PageSize, 1);
 
-        List<TaskSearchItem> tasksQuery = await HandleTasks(query, pattern, skip, take, cancellationToken);
+        List<TodoItemSearch> tasksQuery = await HandleTasks(query, pattern, skip, take, cancellationToken);
 
-        List<SubtaskSearchItem> subtasksQuery = await HandleSubTasks(query, pattern, skip, take, cancellationToken);
+        List<TodoSubItemSearch> subtasksQuery = await HandleSubTasks(query, pattern, skip, take, cancellationToken);
 
-        List<AttachmentSearchItem> attachmentsQuery = await HandleTaskAttachments(query, pattern, skip, take, cancellationToken);
+        List<TodoItemAttachmentSearch> attachmentsQuery = await HandleTaskAttachments(query, pattern, skip, take, cancellationToken);
 
-        List<UserSearchItem> usersQuery = await HandleUsers(pattern, skip, take, cancellationToken);
+        List<UserItemSearch> usersQuery = await HandleUsers(pattern, skip, take, cancellationToken);
 
         var response = new SearchResponse
         {
@@ -45,7 +45,7 @@ internal sealed class GetSearchQueryHandler(IApplicationDbContext context, IUser
         return response;
     }
 
-    private async Task<List<UserSearchItem>> HandleUsers(string pattern, int skip, int take, CancellationToken cancellationToken)
+    private async Task<List<UserItemSearch>> HandleUsers(string pattern, int skip, int take, CancellationToken cancellationToken)
     {
         return await context.Users
                     .AsNoTracking()
@@ -56,7 +56,7 @@ internal sealed class GetSearchQueryHandler(IApplicationDbContext context, IUser
                     .OrderBy(u => u.Email)
                     .Skip(skip)
                     .Take(take)
-                    .Select(u => new UserSearchItem
+                    .Select(u => new UserItemSearch
                     {
                         Id = u.Id,
                         DisplayName = $"{u.FirstName} {u.LastName}",
@@ -65,7 +65,7 @@ internal sealed class GetSearchQueryHandler(IApplicationDbContext context, IUser
                     .ToListAsync(cancellationToken);
     }
 
-    private async Task<List<AttachmentSearchItem>> HandleTaskAttachments(SearchQuery query, string pattern, int skip, int take, CancellationToken cancellationToken)
+    private async Task<List<TodoItemAttachmentSearch>> HandleTaskAttachments(SearchQuery query, string pattern, int skip, int take, CancellationToken cancellationToken)
     {
         return await context.TodoAttachments
                     .Include(x => x.TodoItem)
@@ -76,7 +76,7 @@ internal sealed class GetSearchQueryHandler(IApplicationDbContext context, IUser
                     .OrderByDescending(a => a.UpdatedOn ?? a.CreatedOn)
                     .Skip(skip)
                     .Take(take)
-                    .Select(a => new AttachmentSearchItem
+                    .Select(a => new TodoItemAttachmentSearch
                     {
                         Id = a.Id,
                         OriginalFileName = a.OriginalFileName,
@@ -88,7 +88,7 @@ internal sealed class GetSearchQueryHandler(IApplicationDbContext context, IUser
                     .ToListAsync(cancellationToken);
     }
 
-    private async Task<List<SubtaskSearchItem>> HandleSubTasks(SearchQuery query, string pattern, int skip, int take, CancellationToken cancellationToken)
+    private async Task<List<TodoSubItemSearch>> HandleSubTasks(SearchQuery query, string pattern, int skip, int take, CancellationToken cancellationToken)
     {
         return await context.TodoSubItems
                     .Include(x => x.TodoItem)
@@ -99,7 +99,7 @@ internal sealed class GetSearchQueryHandler(IApplicationDbContext context, IUser
                     .OrderByDescending(s => s.UpdatedOn ?? s.CreatedOn)
                     .Skip(skip)
                     .Take(take)
-                    .Select(s => new SubtaskSearchItem
+                    .Select(s => new TodoSubItemSearch
                     {
                         Id = s.Id,
                         Description = s.Description,
@@ -110,7 +110,7 @@ internal sealed class GetSearchQueryHandler(IApplicationDbContext context, IUser
                     .ToListAsync(cancellationToken);
     }
 
-    private async Task<List<TaskSearchItem>> HandleTasks(SearchQuery query, string pattern, int skip, int take, CancellationToken cancellationToken)
+    private async Task<List<TodoItemSearch>> HandleTasks(SearchQuery query, string pattern, int skip, int take, CancellationToken cancellationToken)
     {
         return await context.TodoItems
                     .AsNoTracking()
@@ -118,7 +118,7 @@ internal sealed class GetSearchQueryHandler(IApplicationDbContext context, IUser
                     .OrderByDescending(t => t.UpdatedOn ?? t.CreatedOn)
                     .Skip(skip)
                     .Take(take)
-                    .Select(t => new TaskSearchItem
+                    .Select(t => new TodoItemSearch
                     {
                         Id = t.Id,
                         Description = t.Description,

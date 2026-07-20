@@ -5,10 +5,11 @@ using System.Text.Json;
 using Application.Abstractions.Data;
 using Domain.Activities;
 using Microsoft.EntityFrameworkCore;
+using SharedKernel;
 
 namespace Application.Todos.Activities.Log;
 
-public class TodoActivityService(IApplicationDbContext applicationDbContext) : ITodoActivityService
+public class TodoActivityService(IApplicationDbContext applicationDbContext, IDateTimeProvider dateTimeProvider) : ITodoActivityService
 {
     public async Task LogAsync(
         Guid todoId,
@@ -20,8 +21,6 @@ public class TodoActivityService(IApplicationDbContext applicationDbContext) : I
     {
         var activity = new TodoActivity
         {
-            Id = Guid.NewGuid(),
-
             TodoItemId = todoId,
 
             ActivityType = activityType,
@@ -30,7 +29,7 @@ public class TodoActivityService(IApplicationDbContext applicationDbContext) : I
 
             UserId = userId,
 
-            CreatedAtUtc = DateTime.UtcNow,
+            CreatedOn = dateTimeProvider.UtcNow,
 
             Metadata = metadata == null
                 ? null

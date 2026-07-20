@@ -17,7 +17,7 @@ public sealed class SearchDetailResponse
     public SearchDetailSummary Summary { get; init; } = new();
 
 
-    public List<SearchDetailLink> Links { get; init; } = new();
+    public List<SearchDetailLink> Links { get; init; } = [];
 
     public object? Data { get; init; }
 }

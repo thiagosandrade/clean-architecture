@@ -3,7 +3,7 @@ using Domain.Todos;
 
 namespace Application.Todos.GetBy;
 
-public class GetTaskQueryResponse
+public class GetTodoItemQueryResponse
 {
     public Guid Id { get; set; }
     public string Description { get; set; }

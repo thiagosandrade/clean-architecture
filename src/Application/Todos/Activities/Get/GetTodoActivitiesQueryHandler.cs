@@ -23,7 +23,7 @@ internal sealed class GetTodoActivitiesQueryHandler(IApplicationDbContext contex
             .TodoActivities
             .Include(x => x.User)
             .Where(x => x.TodoItemId == query.TodoId)
-            .OrderByDescending(x => x.CreatedAtUtc)
+            .OrderByDescending(x => x.CreatedOn)
             .ToListAsync(cancellationToken);
 
         var result = new GetTodoActivityResponse(resultActivities);

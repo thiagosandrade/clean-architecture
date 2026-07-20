@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using Domain.Todos;
 using Domain.Users;
+using SharedKernel;
 
 namespace Domain.Activities;
 
-public sealed class TodoActivity
+public sealed class TodoActivity : Entity
 {
     public Guid Id { get; set; }
 
@@ -21,8 +22,6 @@ public sealed class TodoActivity
     public Guid UserId { get; set; }
 
     public User User { get; set; }
-
-    public DateTime CreatedAtUtc { get; set; }
 
     public string? Metadata { get; set; }
 }

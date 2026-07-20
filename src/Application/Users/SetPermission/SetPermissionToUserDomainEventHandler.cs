@@ -1,7 +1,7 @@
 ﻿using Domain.Users;
 using SharedKernel;
 
-namespace Application.Users.Register;
+namespace Application.Users.SetPermission;
 
 internal sealed class RemovePermissionToUserDomainEventHandler : IDomainEventHandler<SetPermissionToUserDomainEvent>
 {

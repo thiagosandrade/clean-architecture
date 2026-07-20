@@ -13,7 +13,7 @@ public sealed class TodoResponse
     public DateTime CreatedAt { get; set; }
     public DateTime? CompletedAt { get; set; }
     public IEnumerable<string> Labels { get; set; }
-    public IEnumerable<TodoSubItemResponse> Subtasks { get; set; } = [];
+    public IEnumerable<TodoSubItemResponse> SubItems { get; set; } = [];
     public IEnumerable<TaskDependencyResponse> Dependencies { get; set; } = [];
 
     public IEnumerable<string> Categories { get; set; }

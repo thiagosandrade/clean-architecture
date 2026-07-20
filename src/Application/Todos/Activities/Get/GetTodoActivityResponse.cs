@@ -14,7 +14,7 @@ public class GetTodoActivityResponse
             ActivityType = x.ActivityType,
             Description = x.Description,
             Username = $"{x.User.FirstName} {x.User.LastName}",
-            CreatedAtUtc = x.CreatedAtUtc,
+            CreatedAtUtc = x.CreatedOn,
         });
     }
 

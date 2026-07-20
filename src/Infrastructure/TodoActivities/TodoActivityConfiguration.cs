@@ -29,6 +29,6 @@ public sealed class TodoActivityConfiguration
 
         builder.HasIndex(x => x.TodoItemId);
 
-        builder.HasIndex(x => x.CreatedAtUtc);
+        builder.HasIndex(x => x.CreatedOn);
     }
 }

@@ -9,16 +9,16 @@ using SharedKernel;
 namespace Application.Todos.GetBy;
 
 internal sealed class GetTaskQueryHandler(IApplicationDbContext context, IUserContext userContext)
-    : IQueryHandler<GetTaskQuery, List<GetTaskQueryResponse>>
+    : IQueryHandler<GetTodoItemQuery, List<GetTodoItemQueryResponse>>
 {
-    public async Task<Result<List<GetTaskQueryResponse>>> Handle(GetTaskQuery query, CancellationToken cancellationToken)
+    public async Task<Result<List<GetTodoItemQueryResponse>>> Handle(GetTodoItemQuery query, CancellationToken cancellationToken)
     {
         if (query.UserId != userContext.UserId)
         {
-            return Result.Failure<List<GetTaskQueryResponse>>(UserErrors.Unauthorized());
+            return Result.Failure<List<GetTodoItemQueryResponse>>(UserErrors.Unauthorized());
         }
 
-        IQueryable<GetTaskQueryResponse> todos = context.TodoItems
+        IQueryable<GetTodoItemQueryResponse> todos = context.TodoItems
             .AsNoTracking()
             .Where(t =>
                 t.UserId == query.UserId &&
@@ -29,13 +29,13 @@ internal sealed class GetTaskQueryHandler(IApplicationDbContext context, IUserCo
             )
             .OrderBy(x => x.Description)
             .Take(20)
-            .Select(todoItem => new GetTaskQueryResponse
+            .Select(todoItem => new GetTodoItemQueryResponse
             {
                 Id = todoItem.Id,
                 Description = todoItem.Description,
             });
 
-        List<GetTaskQueryResponse> result = await todos.ToListAsync(cancellationToken);
+        List<GetTodoItemQueryResponse> result = await todos.ToListAsync(cancellationToken);
 
         return result;
     }

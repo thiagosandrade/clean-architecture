@@ -9,13 +9,13 @@ public sealed record QuickSearchQuery(Guid UserId, string Text, int Limit = 5) :
 
 public sealed class QuickSearchResponse
 {
-    public List<TaskSearchItem> Tasks { get; init; } = new();
-    public List<SubtaskSearchItem> Subtasks { get; init; } = new();
-    public List<AttachmentSearchItem> Attachments { get; init; } = new();
-    public List<UserSearchItem> Users { get; init; } = new();
+    public List<TodoItemSearch> Tasks { get; init; } = [];
+    public List<TodoSubItemSearch> Subtasks { get; init; } = [];
+    public List<TodoItemAttachmentSearch> Attachments { get; init; } = [];
+    public List<UserItemSearch> Users { get; init; } = [];
 }
 
-public sealed class TaskSearchItem
+public sealed class TodoItemSearch
 {
     public Guid Id { get; init; }
     public string Description { get; init; }
@@ -24,7 +24,7 @@ public sealed class TaskSearchItem
     public bool Completed { get; init; }
 }
 
-public sealed class SubtaskSearchItem
+public sealed class TodoSubItemSearch
 {
     public Guid Id { get; init; }
     public string Description { get; init; }
@@ -33,7 +33,7 @@ public sealed class SubtaskSearchItem
     public string TaskDescription { get; init; }
 }
 
-public sealed class AttachmentSearchItem
+public sealed class TodoItemAttachmentSearch
 {
     public Guid Id { get; init; }
     public string OriginalFileName { get; init; }
@@ -43,7 +43,7 @@ public sealed class AttachmentSearchItem
     public string TaskDescription { get; init; }
 }
 
-public sealed class UserSearchItem
+public sealed class UserItemSearch
 {
     public Guid Id { get; init; }
     public string DisplayName { get; init; }

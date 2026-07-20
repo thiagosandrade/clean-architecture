@@ -16,8 +16,8 @@ namespace Application.Search;
 internal sealed class GetSearchDetailQueryHandler(IApplicationDbContext context, IUserContext userContext)
     : IQueryHandler<SearchDetailQuery, SearchDetailResponse>
 {
-    private const string TASK = "TASK";
-    private const string SUBTASK = "SUBTASK";
+    private const string TODOITEM = "TODOITEM";
+    private const string TODOSUBITEM = "TODOSUBITEM";
     private const string ATTACHMENT = "ATTACHMENT";
     private const string USER = "USER";
 
@@ -30,14 +30,14 @@ internal sealed class GetSearchDetailQueryHandler(IApplicationDbContext context,
 
         string type = (query.Type ?? string.Empty).Trim().ToUpperInvariant();
 
-        if (type == TASK)
+        if (type == TODOITEM)
         {
-            return await HandleTask(query, cancellationToken);
+            return await HandleTodoItem(query, cancellationToken);
         }
 
-        if (type == SUBTASK)
+        if (type == TODOSUBITEM)
         {
-            return await HandleSubtask(query, cancellationToken);
+            return await HandleSubItem(query, cancellationToken);
         }
 
         if (type == ATTACHMENT)
@@ -53,7 +53,7 @@ internal sealed class GetSearchDetailQueryHandler(IApplicationDbContext context,
         return Result.Failure<SearchDetailResponse>(UserErrors.NotFound(query.Id));
     }
 
-    private async Task<Result<SearchDetailResponse>> HandleTask(SearchDetailQuery query, CancellationToken cancellationToken)
+    private async Task<Result<SearchDetailResponse>> HandleTodoItem(SearchDetailQuery query, CancellationToken cancellationToken)
     {
         TodoItem? todo = await context.TodoItems
             .AsNoTracking()
@@ -73,13 +73,13 @@ internal sealed class GetSearchDetailQueryHandler(IApplicationDbContext context,
             .Select(u => new { u.FirstName, u.LastName })
             .SingleOrDefaultAsync(cancellationToken);
 
-        List<SearchDetailLink> links = new();
+        List<SearchDetailLink> links = [];
 
         if (todo.SubItems != null)
         {
             links.AddRange(todo.SubItems.Select(s => new SearchDetailLink
             {
-                Type = "subtask",
+                Type = "todoSubItem",
                 Id = s.Id,
                 Description = s.Description
             }));
@@ -97,7 +97,7 @@ internal sealed class GetSearchDetailQueryHandler(IApplicationDbContext context,
 
         var response = new SearchDetailResponse
         {
-            Type = "task",
+            Type = "todoItem",
             Id = todo.Id,
             Title = todo.Description,
             Subtitle = todo.Priority.ToString(),
@@ -124,21 +124,21 @@ internal sealed class GetSearchDetailQueryHandler(IApplicationDbContext context,
         return response;
     }
 
-    private async Task<Result<SearchDetailResponse>> HandleSubtask(SearchDetailQuery query, CancellationToken cancellationToken)
+    private async Task<Result<SearchDetailResponse>> HandleSubItem(SearchDetailQuery query, CancellationToken cancellationToken)
     {
-        TodoSubItem? subtask = await context.TodoSubItems
+        TodoSubItem? subItem = await context.TodoSubItems
             .AsNoTracking()
             .Where(s => s.Id == query.Id)
             .SingleOrDefaultAsync(cancellationToken);
 
-        if (subtask is null)
+        if (subItem is null)
         {
             return Result.Failure<SearchDetailResponse>(UserErrors.NotFound(query.Id));
         }
 
         TodoItem? parentTask = await context.TodoItems
             .AsNoTracking()
-            .Where(t => t.Id == subtask.TodoItemId && t.UserId == query.UserId)
+            .Where(t => t.Id == subItem.TodoItemId && t.UserId == query.UserId)
             .SingleOrDefaultAsync(cancellationToken);
 
         if (parentTask is null)
@@ -148,22 +148,22 @@ internal sealed class GetSearchDetailQueryHandler(IApplicationDbContext context,
 
         var response = new SearchDetailResponse
         {
-            Type = "subtask",
-            Id = subtask.Id,
-            Title = subtask.Description,
+            Type = "todoSubItem",
+            Id = subItem.Id,
+            Title = subItem.Description,
             Subtitle = parentTask.Description,
             Summary = new SearchDetailSummary
             {
                 CreatedBy = string.Empty,
-                CreatedOn = subtask.CreatedOn,
-                UpdatedOn = subtask.UpdatedOn,
-                Status = subtask.IsCompleted ? "Completed" : "Active"
+                CreatedOn = subItem.CreatedOn,
+                UpdatedOn = subItem.UpdatedOn,
+                Status = subItem.IsCompleted ? "Completed" : "Active"
             },
             Links =
             [
-                new() { Type = "task", Id = parentTask.Id, Description = parentTask.Description }
+                new() { Type = "TodoItem", Id = parentTask.Id, Description = parentTask.Description }
             ],
-            Data = new { subtask.Id, subtask.Description, subtask.IsCompleted, TaskId = parentTask.Id }
+            Data = new { subItem.Id, subItem.Description, subItem.IsCompleted, TaskId = parentTask.Id }
         };
 
         return response;
@@ -181,12 +181,12 @@ internal sealed class GetSearchDetailQueryHandler(IApplicationDbContext context,
             return Result.Failure<SearchDetailResponse>(UserErrors.NotFound(query.Id));
         }
 
-        TodoItem? parentTask = await context.TodoItems
+        TodoItem? todoItem = await context.TodoItems
             .AsNoTracking()
             .Where(t => t.Id == attachment.TodoItemId && t.UserId == query.UserId)
             .SingleOrDefaultAsync(cancellationToken);
 
-        if (parentTask is null)
+        if (todoItem is null)
         {
             return Result.Failure<SearchDetailResponse>(UserErrors.NotFound(query.Id));
         }
@@ -196,7 +196,7 @@ internal sealed class GetSearchDetailQueryHandler(IApplicationDbContext context,
             Type = "attachment",
             Id = attachment.Id,
             Title = attachment.OriginalFileName,
-            Subtitle = parentTask.Description,
+            Subtitle = todoItem.Description,
             Summary = new SearchDetailSummary
             {
                 CreatedBy = string.Empty,
@@ -206,9 +206,9 @@ internal sealed class GetSearchDetailQueryHandler(IApplicationDbContext context,
             },
             Links =
             [
-                new() { Type = "task", Id = parentTask.Id, Description = parentTask.Description }
+                new() { Type = "todoItem", Id = todoItem.Id, Description = todoItem.Description }
             ],
-            Data = new { attachment.Id, attachment.OriginalFileName, attachment.ContentType, attachment.Size, TaskId = parentTask.Id }
+            Data = new { attachment.Id, attachment.OriginalFileName, attachment.ContentType, attachment.Size, TaskId = todoItem.Id }
         };
 
         return response;

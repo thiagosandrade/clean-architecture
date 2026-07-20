@@ -3,7 +3,7 @@ using Application.Abstractions.Data;
 using Application.Abstractions.Extensions;
 using Application.Abstractions.Messaging;
 using Application.OpenAI.Embeddings;
-using Application.Todos.GetByDescription;
+using Application.Todos.GetById;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Pgvector;
@@ -15,17 +15,17 @@ namespace Application.Todos.Search;
 internal sealed class SearchTodosQueryHandler(
     IApplicationDbContext context,
     IEmbeddingsService embeddingsService)
-    : IQueryHandler<SearchTodosQuery, PagedResponse<SearchTodoResponse>>
+    : IQueryHandler<SearchTodoItemsQuery, PagedResponse<SearchTodoItemResponse>>
 {
     private const int SemanticCandidateLimit = 1000;
 
-    public async Task<Result<PagedResponse<SearchTodoResponse>>> Handle(
-        SearchTodosQuery query,
+    public async Task<Result<PagedResponse<SearchTodoItemResponse>>> Handle(
+        SearchTodoItemsQuery query,
         CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(query.Searchtext))
         {
-            return Result.Failure<PagedResponse<SearchTodoResponse>>(
+            return Result.Failure<PagedResponse<SearchTodoItemResponse>>(
                 UserErrors.Unauthorized());
         }
 
@@ -36,7 +36,7 @@ internal sealed class SearchTodosQueryHandler(
         Vector queryVector = vectorArray.ToVector();
 
         // 3. Semantic search - retrieve closest candidates
-        IQueryable<SearchTodoResponse> todos =
+        IQueryable<SearchTodoItemResponse> todos =
             context.TodoItems
                 .AsNoTracking()
                 .Where(x =>
@@ -49,7 +49,7 @@ internal sealed class SearchTodosQueryHandler(
                 })
                 .OrderBy(x => x.Distance)
                 .Take(SemanticCandidateLimit)
-                .Select(x => new SearchTodoResponse
+                .Select(x => new SearchTodoItemResponse
                 {
                     Id = x.Todo.Id,
                     UserId = x.Todo.UserId,
@@ -62,7 +62,7 @@ internal sealed class SearchTodosQueryHandler(
                     CompletedAt = x.Todo.CompletedAt,
                     Priority = x.Todo.Priority,
                     Similarity = 1 - x.Distance,
-                    Subtasks = x.Todo.SubItems.Select(y => new TodoSubtaskResponse()
+                    SubItems = x.Todo.SubItems.Select(y => new SearchTodoSubItemResponse()
                     {
                         CompletedAt = y.CompletedAt,
                         CreatedAt = y.CreatedOn,
@@ -96,10 +96,10 @@ internal sealed class SearchTodosQueryHandler(
         }
 
         // 7. Execute
-        List<SearchTodoResponse> resultTodos =
+        List<SearchTodoItemResponse> resultTodos =
             await todos.ToListAsync(cancellationToken);
 
-        return new PagedResponse<SearchTodoResponse>(
+        return new PagedResponse<SearchTodoItemResponse>(
             resultTodos,
             totalItems);
     }

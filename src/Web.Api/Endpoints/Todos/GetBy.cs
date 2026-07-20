@@ -22,12 +22,12 @@ internal sealed class GetBy : IEndpoint
     {
         app.MapPost("todos/searchby", async (
             [FromBody] GetSearchByRequest request,
-            IQueryHandler<GetTaskQuery, List<GetTaskQueryResponse>> handler,
+            IQueryHandler<GetTodoItemQuery, List<GetTodoItemQueryResponse>> handler,
             CancellationToken cancellationToken) =>
         {
-            var command = new GetTaskQuery(request.UserId, request.Description);
+            var command = new GetTodoItemQuery(request.UserId, request.Description);
 
-            Result<List<GetTaskQueryResponse>> result = await handler.Handle(command, cancellationToken);
+            Result<List<GetTodoItemQueryResponse>> result = await handler.Handle(command, cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })

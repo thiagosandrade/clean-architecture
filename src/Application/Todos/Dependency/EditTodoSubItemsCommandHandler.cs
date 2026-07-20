@@ -1,14 +1,13 @@
 ﻿using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
-using Application.Todos.Dependency;
 using Domain.Activities;
 using Domain.Todos;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
-namespace Application.Todos.EditSubItem;
+namespace Application.Todos.Dependency;
 
 internal sealed class EditTodoDependenciesCommandHandler(
     IApplicationDbContext context,

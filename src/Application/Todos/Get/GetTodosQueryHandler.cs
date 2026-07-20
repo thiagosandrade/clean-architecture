@@ -6,22 +6,22 @@ using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 using System.Linq.Dynamic.Core;
 
-namespace Application.Todos.GetByDescription;
+namespace Application.Todos.Get;
 
 internal sealed class GetTodosQueryHandler(IApplicationDbContext context, IUserContext userContext)
-    : IQueryHandler<GetTodosQuery, PagedResponse<TodoResponse>>
+    : IQueryHandler<GetTodosQuery, PagedResponse<TodoItemResponse>>
 {
-    public async Task<Result<PagedResponse<TodoResponse>>> Handle(GetTodosQuery query, CancellationToken cancellationToken)
+    public async Task<Result<PagedResponse<TodoItemResponse>>> Handle(GetTodosQuery query, CancellationToken cancellationToken)
     {
         if (query.UserId != userContext.UserId)
         {
-            return Result.Failure<PagedResponse<TodoResponse>>(UserErrors.Unauthorized());
+            return Result.Failure<PagedResponse<TodoItemResponse>>(UserErrors.Unauthorized());
         }
 
-        IQueryable<TodoResponse> todos = context.TodoItems
+        IQueryable<TodoItemResponse> todos = context.TodoItems
             .AsNoTracking()
             .Where(todoItem => todoItem.UserId == query.UserId)
-            .Select(todoItem => new TodoResponse
+            .Select(todoItem => new TodoItemResponse
             {
                 Id = todoItem.Id,
                 UserId = todoItem.UserId,
@@ -33,7 +33,7 @@ internal sealed class GetTodosQueryHandler(IApplicationDbContext context, IUserC
                 CreatedAt = todoItem.CreatedOn,
                 CompletedAt = todoItem.CompletedAt,
                 Priority = todoItem.Priority,
-                Subtasks = todoItem.SubItems.Select(y => new TodoSubtaskResponse()
+                SubItems = todoItem.SubItems.Select(y => new TodoSubItemResponse()
                 {
                     TodoItemId = y.TodoItemId,
                     Id = y.Id,
@@ -101,9 +101,9 @@ internal sealed class GetTodosQueryHandler(IApplicationDbContext context, IUserC
                 .Take(query.Pagination.Size);
         }
 
-        List<TodoResponse> resultTodos = await todos.ToListAsync(cancellationToken);
+        List<TodoItemResponse> resultTodos = await todos.ToListAsync(cancellationToken);
 
-        var result = new PagedResponse<TodoResponse>(resultTodos, totalItems);
+        var result = new PagedResponse<TodoItemResponse>(resultTodos, totalItems);
 
         return result;
     }

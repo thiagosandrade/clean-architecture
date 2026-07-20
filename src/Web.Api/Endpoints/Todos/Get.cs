@@ -1,6 +1,6 @@
 ﻿using Application.Abstractions.Constants;
 using Application.Abstractions.Messaging;
-using Application.Todos.GetByDescription;
+using Application.Todos.Get;
 using Domain.Todos;
 using SharedKernel;
 using Web.Api.Extensions;
@@ -36,7 +36,7 @@ internal sealed class Get : IEndpoint
     {
         app.MapGet("todos", async (
             [AsParameters] GetTodosRequest request,
-            IQueryHandler <GetTodosQuery, PagedResponse<TodoResponse>> handler,
+            IQueryHandler <GetTodosQuery, PagedResponse<TodoItemResponse>> handler,
             CancellationToken cancellationToken) =>
         {
             var query = new GetTodosQuery(
@@ -52,7 +52,7 @@ internal sealed class Get : IEndpoint
                 }
             );
 
-            Result<PagedResponse<TodoResponse>> result = await handler.Handle(query, cancellationToken);
+            Result<PagedResponse<TodoItemResponse>> result = await handler.Handle(query, cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })

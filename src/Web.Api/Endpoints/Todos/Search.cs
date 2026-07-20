@@ -1,6 +1,5 @@
 ﻿using Application.Abstractions.Constants;
 using Application.Abstractions.Messaging;
-using Application.Todos.GetByDescription;
 using Application.Todos.Search;
 using Domain.Users;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -22,7 +21,7 @@ internal sealed class Search : IEndpoint
             int size,
             string? propertyName,
             bool? descending,
-            IQueryHandler<SearchTodosQuery, PagedResponse<SearchTodoResponse>> handler,
+            IQueryHandler<SearchTodoItemsQuery, PagedResponse<SearchTodoItemResponse>> handler,
             CancellationToken cancellationToken) =>
         {
             Sorted? sorting = null;
@@ -32,14 +31,14 @@ internal sealed class Search : IEndpoint
                 sorting = new Sorted(propertyName,descending ?? false);
             }
 
-            var query = new SearchTodosQuery(
+            var query = new SearchTodoItemsQuery(
                 searchtext,
                 userId,
                 new Paginated(page, size),
                 sorting
             );
 
-            Result<PagedResponse<SearchTodoResponse>> result = await handler.Handle(query, cancellationToken);
+            Result<PagedResponse<SearchTodoItemResponse>> result = await handler.Handle(query, cancellationToken);
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })

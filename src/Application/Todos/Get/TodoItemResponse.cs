@@ -1,9 +1,9 @@
 ﻿using Application.Todos.GetById;
 using Domain.Todos;
 
-namespace Application.Todos.GetByDescription;
+namespace Application.Todos.Get;
 
-public class TodoResponse
+public class TodoItemResponse
 {
     public Guid Id { get; set; }
     public Guid UserId { get; set; }
@@ -14,6 +14,6 @@ public class TodoResponse
     public DateTime CreatedAt { get; set; }
     public DateTime? CompletedAt { get; set; }
     public IEnumerable<string> Labels { get; set; }
-    public IEnumerable<TodoSubtaskResponse> Subtasks { get; set; } = [];
+    public IEnumerable<TodoSubItemResponse> SubItems { get; set; } = [];
     public IEnumerable<string> Categories { get; set; }
 }
