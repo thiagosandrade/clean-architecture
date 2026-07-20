@@ -24,14 +24,5 @@ internal sealed class TodoItemConfiguration : IEntityTypeConfiguration<TodoItem>
         builder
             .Property(x => x.Embedding)
             .HasColumnType("vector(1536)");
-
-        builder.Navigation(x => x.SubItems)
-            .UsePropertyAccessMode(PropertyAccessMode.Field);
-
-        builder.Navigation(x => x.Dependencies)
-            .UsePropertyAccessMode(PropertyAccessMode.Field);
-
-        builder.Navigation(x => x.Attachments)
-            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

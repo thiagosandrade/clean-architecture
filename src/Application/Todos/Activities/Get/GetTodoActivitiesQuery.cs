@@ -4,5 +4,5 @@ using SharedKernel;
 
 namespace Application.Todos.Activities.Get;
 
-public sealed record GetTaskActivitiesQuery(Guid TodoId, Guid UserId) 
-    : IQuery<GetTaskActivityResponse>;
+public sealed record GetTodoActivitiesQuery(Guid TodoId, Guid UserId) 
+    : IQuery<GetTodoActivityResponse>;

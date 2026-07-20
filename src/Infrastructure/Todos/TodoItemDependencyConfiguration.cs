@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Todos;
 
-internal sealed class TaskItemDependencyConfiguration : IEntityTypeConfiguration<TaskDependency>
+internal sealed class TodoItemDependencyConfiguration : IEntityTypeConfiguration<TodoDependency>
 {
-    public void Configure(EntityTypeBuilder<TaskDependency> builder)
+    public void Configure(EntityTypeBuilder<TodoDependency> builder)
     {
         builder.HasKey(t => t.Id);
 

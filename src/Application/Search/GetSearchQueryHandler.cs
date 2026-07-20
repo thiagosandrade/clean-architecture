@@ -67,7 +67,7 @@ internal sealed class GetSearchQueryHandler(IApplicationDbContext context, IUser
 
     private async Task<List<AttachmentSearchItem>> HandleTaskAttachments(SearchQuery query, string pattern, int skip, int take, CancellationToken cancellationToken)
     {
-        return await context.TaskAttachments
+        return await context.TodoAttachments
                     .Include(x => x.TodoItem)
                     .AsNoTracking()
                     .Where(a =>

@@ -5,12 +5,12 @@ using Domain.Activities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.TaskActivities;
+namespace Infrastructure.TodoActivities;
 
 public sealed class TodoActivityConfiguration
-    : IEntityTypeConfiguration<TaskActivity>
+    : IEntityTypeConfiguration<TodoActivity>
 {
-    public void Configure(EntityTypeBuilder<TaskActivity> builder)
+    public void Configure(EntityTypeBuilder<TodoActivity> builder)
     {
         builder.HasKey(x => x.Id);
 

@@ -3,6 +3,7 @@ using Application.Abstractions.Messaging;
 using Application.Todos.GetBy;
 using Application.Todos.GetById;
 using Domain.Todos;
+using Microsoft.AspNetCore.Mvc;
 using SharedKernel;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
@@ -19,8 +20,8 @@ internal sealed class GetBy : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("todos/searchby", async (
-            [AsParameters] GetSearchByRequest request,
+        app.MapPost("todos/searchby", async (
+            [FromBody] GetSearchByRequest request,
             IQueryHandler<GetTaskQuery, List<GetTaskQueryResponse>> handler,
             CancellationToken cancellationToken) =>
         {

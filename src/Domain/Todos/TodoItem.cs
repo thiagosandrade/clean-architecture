@@ -16,19 +16,22 @@ public sealed class TodoItem : Entity
     public DateTime? CompletedAt { get; set; }
     public Priority Priority { get; set; }
     public Vector? Embedding { get; set; } = default!;
-    
-    public IEnumerable<TaskActivity> TaskActivities { get; set; } = [];
+
+
+    private readonly List<TodoActivity> _activities = [];
+    public IEnumerable<TodoActivity> TaskActivities => _activities;
+
 
     private readonly List<TodoSubItem> _subItems = [];
     public IEnumerable<TodoSubItem> SubItems => _subItems;
 
 
-    private readonly List<TaskDependency> _dependencies = [];
-    public IEnumerable<TaskDependency> Dependencies => _dependencies;
+    private readonly List<TodoDependency> _dependencies = [];
+    public IEnumerable<TodoDependency> Dependencies => _dependencies;
 
 
-    private readonly List<TaskAttachment> _attachments = [];
-    public IEnumerable<TaskAttachment> Attachments => _attachments;
+    private readonly List<TodoAttachment> _attachments = [];
+    public IEnumerable<TodoAttachment> Attachments => _attachments;
 
     public void AddSubItems(IEnumerable<TodoSubItem> subItems)
     {
@@ -65,12 +68,12 @@ public sealed class TodoItem : Entity
         }
 
         _dependencies.Add(
-            new TaskDependency(Id, dependsOnId));
+            new TodoDependency(Id, dependsOnId));
     }
 
     public void RemoveDependency(Guid dependsOnId)
     {
-        TaskDependency? dependency =
+        TodoDependency? dependency =
             _dependencies.FirstOrDefault(
                 x => x.DependsOnTodoItemId == dependsOnId);
 
@@ -80,14 +83,14 @@ public sealed class TodoItem : Entity
         }
     }
 
-    public void AddAttachment(TaskAttachment taskAttachment)
+    public void AddAttachment(TodoAttachment taskAttachment)
     {
         _attachments.Add(taskAttachment);
     }
 
     public void RemoveAttachment(Guid taskAttachmentId)
     {
-        TaskAttachment? attachment =
+        TodoAttachment? attachment =
             _attachments.FirstOrDefault(
                 x => x.Id == taskAttachmentId);
 

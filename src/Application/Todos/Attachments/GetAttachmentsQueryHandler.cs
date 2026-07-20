@@ -20,7 +20,7 @@ internal sealed class GetAttachmentsQueryHandler(
             return Result.Failure<AttachmentsResponse>(UserErrors.Unauthorized());
         }
 
-        List<TaskAttachment> attachments = await context.TaskAttachments
+        List<TodoAttachment> attachments = await context.TodoAttachments
             .Where(a => a.TodoItemId == query.TodoId)
             .OrderByDescending(a => a.CreatedOn)
             .ToListAsync(cancellationToken);

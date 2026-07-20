@@ -9,24 +9,24 @@ using System.Linq.Dynamic.Core;
 
 namespace Application.Todos.Activities.Get;
 
-internal sealed class GetTaskActivitiesQueryHandler(IApplicationDbContext context, IUserContext userContext)
-    : IQueryHandler<GetTaskActivitiesQuery, GetTaskActivityResponse>
+internal sealed class GetTodoActivitiesQueryHandler(IApplicationDbContext context, IUserContext userContext)
+    : IQueryHandler<GetTodoActivitiesQuery, GetTodoActivityResponse>
 {
-    public async Task<Result<GetTaskActivityResponse>> Handle(GetTaskActivitiesQuery query, CancellationToken cancellationToken)
+    public async Task<Result<GetTodoActivityResponse>> Handle(GetTodoActivitiesQuery query, CancellationToken cancellationToken)
     {
         if (query.UserId != userContext.UserId)
         {
-            return Result.Failure<GetTaskActivityResponse>(UserErrors.Unauthorized());
+            return Result.Failure<GetTodoActivityResponse>(UserErrors.Unauthorized());
         }
 
-        List<TaskActivity> resultActivities = await context
-            .TaskActivities
+        List<TodoActivity> resultActivities = await context
+            .TodoActivities
             .Include(x => x.User)
             .Where(x => x.TodoItemId == query.TodoId)
             .OrderByDescending(x => x.CreatedAtUtc)
             .ToListAsync(cancellationToken);
 
-        var result = new GetTaskActivityResponse(resultActivities);
+        var result = new GetTodoActivityResponse(resultActivities);
 
         return result;
     }

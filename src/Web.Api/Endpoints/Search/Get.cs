@@ -3,6 +3,7 @@ using Application.Search;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
 using SharedKernel;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Api.Endpoints.Search;
 
@@ -18,8 +19,8 @@ internal sealed class Get : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("search", async (
-            [AsParameters] SearchRequest request,
+        app.MapPost("search", async (
+            [FromBody] SearchRequest request,
             IQueryHandler<SearchQuery, SearchResponse> handler,
             CancellationToken cancellationToken) =>
         {

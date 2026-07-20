@@ -42,7 +42,7 @@ internal sealed class SubtaskRewriteCommandHander(
 
         SubtaskRewriteResponse response = await subtaskRewriteService.RewriteAsync(command.Description, command.Style, cancellationToken);
 
-        todoItem.Raise(new TaskActivityLogRequestedDomainEvent(command.TodoId, TaskActivityType.DescriptionRewritten, "Description Rewritten but not saved yet", user.Id));
+        todoItem.Raise(new TodoActivityLogRequestedDomainEvent(command.TodoId, TaskActivityType.DescriptionRewritten, "Description Rewritten but not saved yet", user.Id));
 
         return Result.Success<SubtaskRewriteResponse>(response);
     }

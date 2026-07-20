@@ -31,7 +31,7 @@ internal sealed class CreateAttachmentCommandHandler(
             return Result.Failure<Guid>(TodoItemErrors.NotFound(command.TodoId));
         }
 
-        var attachment = new TaskAttachment
+        var attachment = new TodoAttachment
         {
             TodoItemId = command.TodoId,
             OriginalFileName = command.OriginalFileName,
@@ -45,7 +45,7 @@ internal sealed class CreateAttachmentCommandHandler(
 
         todo.AddAttachment(attachment);
 
-        todo.Raise(new TaskActivityLogRequestedDomainEvent(todo.Id, TaskActivityType.AttachmentAdded, "Attachment Added", userContext.UserId));
+        todo.Raise(new TodoActivityLogRequestedDomainEvent(todo.Id, TaskActivityType.AttachmentAdded, "Attachment Added", userContext.UserId));
 
         await context.SaveChangesAsync(cancellationToken);
 

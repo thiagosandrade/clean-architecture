@@ -171,7 +171,7 @@ internal sealed class GetSearchDetailQueryHandler(IApplicationDbContext context,
 
     private async Task<Result<SearchDetailResponse>> HandleAttachment(SearchDetailQuery query, CancellationToken cancellationToken)
     {
-        Domain.Todos.TaskAttachment? attachment = await context.TaskAttachments
+        Domain.Todos.TodoAttachment? attachment = await context.TodoAttachments
             .AsNoTracking()
             .Where(a => a.Id == query.Id)
             .SingleOrDefaultAsync(cancellationToken);

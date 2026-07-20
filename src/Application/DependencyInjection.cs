@@ -46,7 +46,7 @@ public static class DependencyInjection
         services.AddScoped<IParseTodoEnrichmentService, ParseTodoEnrichmentService>();
         services.AddScoped<ISubTaskEnrichmentService, SubTaskEnrichmentService>();
         services.AddScoped<IRewriteEnrichmentService, RewriteEnrichmentService>();
-        services.AddScoped<ITaskActivityService, TaskActivityService>();
+        services.AddScoped<ITodoActivityService, TodoActivityService>();
 
         // OpenAI
         services.AddSingleton(new OpenAIClient(

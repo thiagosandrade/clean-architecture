@@ -21,7 +21,7 @@ internal sealed class DeleteAttachmentCommandHandler(
             return Result.Failure(UserErrors.Unauthorized());
         }
 
-        TaskAttachment? attachment = await context.TaskAttachments
+        TodoAttachment? attachment = await context.TodoAttachments
             .SingleOrDefaultAsync(a => a.Id == command.AttachmentId && a.TodoItemId == command.TodoId, cancellationToken);
 
         if (attachment is null)
@@ -40,7 +40,7 @@ internal sealed class DeleteAttachmentCommandHandler(
 
         todo.RemoveAttachment(attachment.Id);
 
-        todo.Raise(new TaskActivityLogRequestedDomainEvent(todo.Id, TaskActivityType.AttachmentDeleted, "Attachment Deleted", userContext.UserId));
+        todo.Raise(new TodoActivityLogRequestedDomainEvent(todo.Id, TaskActivityType.AttachmentDeleted, "Attachment Deleted", userContext.UserId));
 
         await context.SaveChangesAsync(cancellationToken);
 

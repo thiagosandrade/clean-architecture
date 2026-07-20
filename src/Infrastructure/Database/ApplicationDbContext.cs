@@ -19,9 +19,9 @@ public sealed class ApplicationDbContext(
     public DbSet<TodoItem> TodoItems { get; set; }
     public DbSet<TodoSubItem> TodoSubItems { get; set; }
     public DbSet<Permission> Permissions { get; set; }
-    public DbSet<TaskActivity> TaskActivities { get; set; }
-    public DbSet<TaskDependency> TaskDependencies { get; set; }
-    public DbSet<TaskAttachment> TaskAttachments { get; set; }
+    public DbSet<TodoActivity> TodoActivities { get; set; }
+    public DbSet<TodoDependency> TodoDependencies { get; set; }
+    public DbSet<TodoAttachment> TodoAttachments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

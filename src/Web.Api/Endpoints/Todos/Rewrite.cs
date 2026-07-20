@@ -4,6 +4,7 @@ using Application.Abstractions.Messaging;
 using Application.Todos.Breakdown;
 using Application.Todos.Complete;
 using Application.Todos.Rewrite;
+using Microsoft.AspNetCore.Mvc;
 using SharedKernel;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
@@ -23,9 +24,9 @@ internal sealed class Rewrite : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPut("todos/ai/{id:guid}/rewrite", async (
+        app.MapPost("todos/ai/{id:guid}/rewrite", async (
             Guid id,
-            Request request,
+            [FromBody] Request request,
             ICommandHandler<SubtaskRewriteCommand, SubtaskRewriteResponse> handler,
             CancellationToken cancellationToken) =>
         {
