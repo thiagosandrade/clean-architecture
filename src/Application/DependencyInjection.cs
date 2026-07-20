@@ -1,8 +1,10 @@
-﻿using Application.OpenAI.Embeddings;
+﻿using Application.Elastic;
+using Application.OpenAI.Embeddings;
 using Application.OpenAI.Enrichment;
 using Application.OpenAI.Parser;
 using Application.Todos.Activities.Log;
 using Domain;
+using Elastic.Clients.Elasticsearch;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -65,6 +67,16 @@ public static class DependencyInjection
 
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly, includeInternalTypes: true);
 
+        services.AddSingleton(_ =>
+        {
+            ElasticsearchClientSettings settings = new ElasticsearchClientSettings(
+                new Uri(configuration["Elasticsearch:Uri"]!))
+                .DefaultIndex("todos");
+
+            return new ElasticsearchClient(settings);
+        });
+
+        services.AddScoped<IElasticSearchService, ElasticSearchService>();
 
         return services;
     }
