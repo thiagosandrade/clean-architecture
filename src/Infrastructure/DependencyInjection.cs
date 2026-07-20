@@ -1,8 +1,5 @@
 ﻿using System.Text;
-using Application.Abstractions.Authentication;
-using Application.Abstractions.Data;
-using Infrastructure.Authentication;
-using Infrastructure.Authorization;
+using Domain;
 using Infrastructure.Database;
 using Infrastructure.DomainEvents;
 using Infrastructure.Time;
@@ -15,6 +12,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using SharedKernel;
+using SharedKernel.Abstractions.Data;
+using SharedKernel.Authentication;
+using SharedKernel.Authorization;
 
 namespace Infrastructure;
 

@@ -1,7 +1,4 @@
-﻿using System;
-using System.ClientModel;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.ClientModel;
 using Microsoft.Extensions.Configuration;
 using OpenAI;
 using OpenAI.Embeddings;

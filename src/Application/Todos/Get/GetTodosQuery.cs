@@ -1,6 +1,6 @@
-﻿using Application.Abstractions.Messaging;
+﻿using Domain;
 using Domain.Todos;
-using SharedKernel;
+using SharedKernel.Abstractions.Messaging;
 
 namespace Application.Todos.Get;
 

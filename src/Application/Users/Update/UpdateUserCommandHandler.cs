@@ -1,11 +1,9 @@
-﻿using Application.Abstractions.Authentication;
-using Application.Abstractions.Constants;
-using Application.Abstractions.Data;
-using Application.Abstractions.Messaging;
-using Application.Users.Register;
+﻿using Domain;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel;
+using SharedKernel.Abstractions.Data;
+using SharedKernel.Abstractions.Messaging;
+using SharedKernel.Authentication;
 
 namespace Application.Users.Update;
 

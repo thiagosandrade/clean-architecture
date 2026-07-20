@@ -1,5 +1,5 @@
-﻿using Application.Abstractions.Messaging;
-using SharedKernel;
+﻿using Domain;
+using SharedKernel.Abstractions.Messaging;
 
 namespace Application.Todos.Search;
 

@@ -1,12 +1,7 @@
-﻿using Application.Abstractions.Authentication;
-using Application.Abstractions.Data;
-using Application.Abstractions.Messaging;
-using Application.OpenAI;
+﻿using Application.OpenAI;
 using Application.OpenAI.Parser;
-using Domain.Todos;
-using Domain.Users;
-using Microsoft.EntityFrameworkCore;
-using SharedKernel;
+using Domain;
+using SharedKernel.Abstractions.Messaging;
 
 namespace Application.Todos.ParseText;
 

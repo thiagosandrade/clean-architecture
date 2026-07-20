@@ -1,6 +1,5 @@
 ﻿using Domain.Activities;
 using Pgvector;
-using SharedKernel;
 
 namespace Domain.Todos;
 

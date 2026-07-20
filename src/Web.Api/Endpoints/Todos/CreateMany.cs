@@ -1,11 +1,9 @@
-﻿using Application.Abstractions.Constants;
-using Application.Abstractions.Messaging;
-using Application.Todos.Create;
+﻿using Application.Todos.Create;
+using Domain;
 using Domain.Todos;
-using Microsoft.AspNetCore.Http.HttpResults;
-using SharedKernel;
+using SharedKernel.Abstractions.Constants;
+using SharedKernel.Abstractions.Messaging;
 using Web.Api.Extensions;
-using Web.Api.Infrastructure;
 using static Web.Api.Endpoints.Todos.Create;
 
 namespace Web.Api.Endpoints.Todos;

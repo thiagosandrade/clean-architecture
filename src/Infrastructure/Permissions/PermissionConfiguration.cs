@@ -1,7 +1,7 @@
-﻿using Application.Abstractions.Constants;
-using Domain.Permissions;
+﻿using Domain.Permissions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SharedKernel.Abstractions.Constants;
 
 namespace Infrastructure.Permissions;
 

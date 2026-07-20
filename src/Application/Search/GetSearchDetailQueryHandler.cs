@@ -1,15 +1,10 @@
-using Application.Abstractions.Authentication;
-using Application.Abstractions.Data;
-using Application.Abstractions.Messaging;
+using Domain;
 using Domain.Todos;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using SharedKernel.Abstractions.Data;
+using SharedKernel.Abstractions.Messaging;
+using SharedKernel.Authentication;
 
 namespace Application.Search;
 

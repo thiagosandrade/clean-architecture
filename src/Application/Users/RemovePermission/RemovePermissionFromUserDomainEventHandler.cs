@@ -1,5 +1,5 @@
-﻿using Domain.Users;
-using SharedKernel;
+﻿using Domain;
+using Domain.Users;
 
 namespace Application.Users.RemovePermission;
 

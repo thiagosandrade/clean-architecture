@@ -1,7 +1,7 @@
-﻿using Application.Abstractions.Constants;
-using Domain.Users;
+﻿using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SharedKernel.Abstractions.Constants;
 
 namespace Infrastructure.Users;
 

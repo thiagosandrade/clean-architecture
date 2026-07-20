@@ -1,10 +1,10 @@
-﻿using Application.Abstractions.Constants;
-using Application.Abstractions.Messaging;
-using Application.Todos.Get;
+﻿using Application.Todos.Get;
+using Domain;
 using Domain.Todos;
-using SharedKernel;
+using SharedKernel.Abstractions.Constants;
+using SharedKernel.Abstractions.Messaging;
+using SharedKernel.Extensions;
 using Web.Api.Extensions;
-using Web.Api.Infrastructure;
 
 namespace Web.Api.Endpoints.Todos;
 

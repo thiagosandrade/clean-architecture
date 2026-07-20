@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using Domain.Todos;
 using Domain.Users;
-using SharedKernel;
 
 namespace Domain.Activities;
 

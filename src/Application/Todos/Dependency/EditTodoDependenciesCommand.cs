@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Application.Abstractions.Messaging;
+﻿using SharedKernel.Abstractions.Messaging;
 
 namespace Application.Todos.Dependency;
 

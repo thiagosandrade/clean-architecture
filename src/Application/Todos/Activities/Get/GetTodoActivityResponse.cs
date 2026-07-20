@@ -1,6 +1,4 @@
-﻿using Application.Todos.GetById;
-using Domain.Activities;
-using Domain.Todos;
+﻿using Domain.Activities;
 
 namespace Application.Todos.Activities.Get;
 

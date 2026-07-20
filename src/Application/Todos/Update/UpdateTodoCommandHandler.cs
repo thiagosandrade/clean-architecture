@@ -1,10 +1,9 @@
-using Application.Abstractions.Data;
-using Application.Abstractions.Messaging;
+using Domain;
 using Domain.Activities;
 using Domain.Todos;
-using Domain.Users;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel;
+using SharedKernel.Abstractions.Data;
+using SharedKernel.Abstractions.Messaging;
 
 namespace Application.Todos.Update;
 

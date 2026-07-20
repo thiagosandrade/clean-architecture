@@ -1,9 +1,7 @@
-﻿using Application.Abstractions.Authentication;
-using Application.Abstractions.Data;
-using Application.Abstractions.Messaging;
-using Domain.Users;
+﻿using Domain;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel;
+using SharedKernel.Abstractions.Data;
+using SharedKernel.Abstractions.Messaging;
 
 namespace Application.Permissions.GetAll;
 

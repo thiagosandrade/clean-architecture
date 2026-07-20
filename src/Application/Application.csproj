@@ -16,10 +16,13 @@
     <PackageReference Include="Serilog" />
     <PackageReference Include="Scrutor" />
     <PackageReference Include="System.Linq.Dynamic.Core" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
+
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Domain\Domain.csproj" />
+    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     <ProjectReference Include="..\SharedKernel\SharedKernel.csproj" />
   </ItemGroup>
 

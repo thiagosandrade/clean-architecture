@@ -1,5 +1,4 @@
-﻿using Application.Todos.GetById;
-using Domain.Todos;
+﻿using Domain.Todos;
 
 namespace Application.Todos.Get;
 

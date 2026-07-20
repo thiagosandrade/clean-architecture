@@ -1,4 +1,4 @@
-﻿using Application.Abstractions.Messaging;
+﻿using SharedKernel.Abstractions.Messaging;
 
 namespace Application.Users.GetAll;
 

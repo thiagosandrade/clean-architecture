@@ -1,14 +1,13 @@
 ﻿using System.Linq.Dynamic.Core;
-using Application.Abstractions.Data;
-using Application.Abstractions.Extensions;
-using Application.Abstractions.Messaging;
 using Application.OpenAI.Embeddings;
-using Application.Todos.GetById;
+using Domain;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Pgvector;
 using Pgvector.EntityFrameworkCore;
-using SharedKernel;
+using SharedKernel.Abstractions.Data;
+using SharedKernel.Abstractions.Extensions;
+using SharedKernel.Abstractions.Messaging;
 
 namespace Application.Todos.Search;
 

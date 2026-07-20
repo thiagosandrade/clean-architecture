@@ -1,9 +1,8 @@
-using Application.Abstractions.Messaging;
 using Application.Search;
-using Web.Api.Extensions;
-using Web.Api.Infrastructure;
-using SharedKernel;
 using Microsoft.AspNetCore.Mvc;
+using SharedKernel.Extensions;
+using SharedKernel.Abstractions.Messaging;
+using Domain;
 
 namespace Web.Api.Endpoints.Search;
 

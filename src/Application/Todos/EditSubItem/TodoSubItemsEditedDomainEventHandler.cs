@@ -1,10 +1,5 @@
-﻿using Application.Abstractions.Data;
-using Application.Abstractions.Extensions;
-using Application.OpenAI.Enrichment;
+﻿using Domain;
 using Domain.Todos;
-using Domain.Users;
-using Microsoft.EntityFrameworkCore;
-using SharedKernel;
 
 namespace Application.Todos.EditSubItem;
 

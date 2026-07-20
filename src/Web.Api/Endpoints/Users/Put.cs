@@ -1,8 +1,7 @@
-using Application.Abstractions.Messaging;
 using Application.Users.UpdateProfile;
-using SharedKernel;
-using Web.Api.Extensions;
-using Web.Api.Infrastructure;
+using Domain;
+using SharedKernel.Abstractions.Messaging;
+using SharedKernel.Extensions;
 
 namespace Web.Api.Endpoints.Users;
 

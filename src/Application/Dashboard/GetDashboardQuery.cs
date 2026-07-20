@@ -1,7 +1,4 @@
-using Application.Abstractions.Messaging;
-using SharedKernel;
-using System;
-using System.Collections.Generic;
+using SharedKernel.Abstractions.Messaging;
 
 namespace Application.Dashboard;
 

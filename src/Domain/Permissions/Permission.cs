@@ -1,6 +1,4 @@
-﻿using SharedKernel;
-
-namespace Domain.Permissions;
+﻿namespace Domain.Permissions;
 
 public sealed class Permission : Entity
 {

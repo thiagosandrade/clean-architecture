@@ -1,6 +1,4 @@
-﻿using Application.Abstractions.Messaging;
-using Domain.Todos;
-using SharedKernel;
+﻿using SharedKernel.Abstractions.Messaging;
 
 namespace Application.Todos.Activities.Get;
 

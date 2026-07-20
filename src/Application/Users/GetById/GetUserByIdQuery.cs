@@ -1,5 +1,4 @@
-﻿using Application.Abstractions.Messaging;
-using Application.Users.Login;
+﻿using SharedKernel.Abstractions.Messaging;
 
 namespace Application.Users.GetById;
 

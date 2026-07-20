@@ -1,12 +1,10 @@
-﻿using Application.Abstractions.Constants;
-using Application.Abstractions.Messaging;
-using Application.Todos.GetBy;
-using Application.Todos.GetById;
-using Domain.Todos;
+﻿using Application.Todos.GetBy;
+using Domain;
 using Microsoft.AspNetCore.Mvc;
-using SharedKernel;
+using SharedKernel.Abstractions.Constants;
+using SharedKernel.Abstractions.Messaging;
+using SharedKernel.Extensions;
 using Web.Api.Extensions;
-using Web.Api.Infrastructure;
 
 namespace Web.Api.Endpoints.Todos;
 

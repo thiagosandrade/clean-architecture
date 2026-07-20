@@ -1,5 +1,4 @@
-using Application.Abstractions.Messaging;
-using SharedKernel;
+using SharedKernel.Abstractions.Messaging;
 
 namespace Application.Todos.Attachments;
 

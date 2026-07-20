@@ -1,5 +1,4 @@
 ﻿using Domain.Permissions;
-using SharedKernel;
 
 namespace Domain.Users;
 

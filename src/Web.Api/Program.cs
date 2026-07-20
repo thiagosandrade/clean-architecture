@@ -2,8 +2,10 @@ using System.Reflection;
 using Application;
 using HealthChecks.UI.Client;
 using Infrastructure;
+using Infrastructure.Extensions;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Serilog;
+using SharedKernel.Extensions;
 using Web.Api;
 using Web.Api.Extensions;
 
@@ -14,7 +16,7 @@ builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configu
 builder.Services.AddSwaggerGenWithAuth();
 
 builder.Services
-    .AddApplication(builder.Configuration)
+    .AddBackendApplication(builder.Configuration)
     .AddPresentation()
     .AddInfrastructure(builder.Configuration);
 

@@ -2,7 +2,6 @@
 using System.Text.Json;
 using Application.Todos.Breakdown;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using OpenAI;
 using OpenAI.Chat;
 

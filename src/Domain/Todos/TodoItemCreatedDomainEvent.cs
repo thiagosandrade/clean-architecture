@@ -1,5 +1,3 @@
-﻿using SharedKernel;
-
-namespace Domain.Todos;
+﻿namespace Domain.Todos;
 
 public sealed record TodoItemCreatedDomainEvent(Guid TodoItemId) : IDomainEvent;

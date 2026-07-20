@@ -1,7 +1,4 @@
-﻿using Application.Todos.GetById;
-using Domain.Todos;
-
-namespace Application.Todos.GetBy;
+﻿namespace Application.Todos.GetBy;
 
 public class GetTodoItemQueryResponse
 {

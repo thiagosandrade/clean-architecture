@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Application.Todos.Breakdown;
+﻿namespace Application.Todos.Breakdown;
 
 public enum BreakdownComplexity
 {

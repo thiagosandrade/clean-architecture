@@ -1,5 +1,3 @@
-using SharedKernel;
-
 namespace Domain.Todos;
 
 public sealed class TodoAttachment : Entity

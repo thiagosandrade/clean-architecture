@@ -17,6 +17,9 @@
     <Project Path="src/SharedKernel/SharedKernel.csproj" />
     <Project Path="src/Web.Api/Web.Api.csproj" />
   </Folder>
+  <Folder Name="/src/microservices/">
+    <Project Path="src/Microservices/DataProcessor/DataProcessor.Api.csproj" Id="40608110-aaf7-441c-804e-d74531a4d2e0" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/ArchitectureTests/ArchitectureTests.csproj" />
   </Folder>

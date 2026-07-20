@@ -1,6 +1,4 @@
-using Application.Abstractions.Messaging;
-using SharedKernel;
-using System;
+using SharedKernel.Abstractions.Messaging;
 
 namespace Application.Search;
 

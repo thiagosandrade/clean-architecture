@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using Infrastructure.Authorization;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Web.Api.Endpoints;
 

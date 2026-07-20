@@ -1,9 +1,5 @@
-﻿using System;
-using System.ClientModel;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.ClientModel;
 using System.Text.Json;
-using Domain.Todos;
 using Microsoft.Extensions.Configuration;
 using OpenAI;
 using OpenAI.Chat;

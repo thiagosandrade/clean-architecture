@@ -1,13 +1,5 @@
-﻿using Application.Abstractions.Data;
-using Application.Abstractions.Extensions;
-using Application.OpenAI;
-using Application.OpenAI.Embeddings;
-using Application.OpenAI.Enrichment;
+﻿using Domain;
 using Domain.Activities;
-using Domain.Todos;
-using Domain.Users;
-using Microsoft.EntityFrameworkCore;
-using SharedKernel;
 
 namespace Application.Todos.Activities.Log;
 

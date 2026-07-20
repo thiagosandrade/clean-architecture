@@ -1,4 +1,4 @@
-﻿using Application.Abstractions.Data;
+﻿using Domain;
 using Domain.Activities;
 using Domain.Permissions;
 using Domain.Todos;
@@ -6,6 +6,7 @@ using Domain.Users;
 using Infrastructure.DomainEvents;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
+using SharedKernel.Abstractions.Data;
 
 namespace Infrastructure.Database;
 

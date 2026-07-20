@@ -1,13 +1,10 @@
-﻿using Application.Abstractions.Authentication;
-using Application.Abstractions.Constants;
-using Application.Abstractions.Messaging;
-using Application.Todos.Breakdown;
-using Application.Todos.Complete;
-using Application.Todos.Rewrite;
+﻿using Application.Todos.Rewrite;
+using Domain;
 using Microsoft.AspNetCore.Mvc;
-using SharedKernel;
+using SharedKernel.Abstractions.Constants;
+using SharedKernel.Abstractions.Messaging;
+using SharedKernel.Extensions;
 using Web.Api.Extensions;
-using Web.Api.Infrastructure;
 
 namespace Web.Api.Endpoints.Todos;
 

@@ -1,4 +1,5 @@
-﻿using SharedKernel;
+﻿using Domain;
+using SharedKernel;
 
 namespace Infrastructure.DomainEvents;
 

@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.Json;
-using Application.Abstractions.Data;
+﻿using System.Text.Json;
+using Domain;
 using Domain.Activities;
-using Microsoft.EntityFrameworkCore;
-using SharedKernel;
+using SharedKernel.Abstractions.Data;
 
 namespace Application.Todos.Activities.Log;
 

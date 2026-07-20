@@ -1,10 +1,10 @@
-using Application.Abstractions.Data;
-using Application.Abstractions.Messaging;
-using Application.Abstractions.Authentication;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel;
 using Domain.Users;
 using Domain.Todos;
+using SharedKernel.Authentication;
+using SharedKernel.Abstractions.Data;
+using SharedKernel.Abstractions.Messaging;
+using Domain;
 
 namespace Application.Todos.Attachments;
 
