@@ -4,7 +4,7 @@ namespace Application.Todos.Attachments;
 
 public sealed class AttachmentResponse
 {
-    public AttachmentResponse(TaskAttachment attachment)
+    public AttachmentResponse(TodoAttachment attachment)
     {
         Id = attachment.Id;
         TodoItemId = attachment.TodoItemId;

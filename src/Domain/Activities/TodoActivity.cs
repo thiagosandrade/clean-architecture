@@ -6,7 +6,7 @@ using Domain.Users;
 
 namespace Domain.Activities;
 
-public sealed class TaskActivity
+public sealed class TodoActivity
 {
     public Guid Id { get; set; }
 

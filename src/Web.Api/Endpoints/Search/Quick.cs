@@ -3,6 +3,7 @@ using Application.Search;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
 using SharedKernel;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Api.Endpoints.Search;
 
@@ -17,8 +18,8 @@ internal sealed class Quick : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("search/quick", async (
-            [AsParameters] QuickSearchRequest request,
+        app.MapPost("search/quick", async (
+            [FromBody] QuickSearchRequest request,
             IQueryHandler<QuickSearchQuery, QuickSearchResponse> handler,
             CancellationToken cancellationToken) =>
         {

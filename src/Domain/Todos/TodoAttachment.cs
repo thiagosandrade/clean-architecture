@@ -2,7 +2,7 @@ using SharedKernel;
 
 namespace Domain.Todos;
 
-public sealed class TaskAttachment : Entity
+public sealed class TodoAttachment : Entity
 {
     public Guid Id { get; set; }
 

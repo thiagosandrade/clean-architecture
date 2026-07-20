@@ -2,7 +2,7 @@
 
 namespace Application.Todos.Activities.Log;
 
-public interface ITaskActivityService
+public interface ITodoActivityService
 {
     Task LogAsync(
         Guid todoId,

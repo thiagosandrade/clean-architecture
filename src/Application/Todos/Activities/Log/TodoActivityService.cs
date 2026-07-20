@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Todos.Activities.Log;
 
-public class TaskActivityService(IApplicationDbContext applicationDbContext) : ITaskActivityService
+public class TodoActivityService(IApplicationDbContext applicationDbContext) : ITodoActivityService
 {
     public async Task LogAsync(
         Guid todoId,
@@ -18,7 +18,7 @@ public class TaskActivityService(IApplicationDbContext applicationDbContext) : I
         object? metadata = null,
         CancellationToken cancellationToken = default)
     {
-        var activity = new TaskActivity
+        var activity = new TodoActivity
         {
             Id = Guid.NewGuid(),
 
@@ -37,7 +37,7 @@ public class TaskActivityService(IApplicationDbContext applicationDbContext) : I
                 : JsonSerializer.Serialize(metadata)
         };
 
-        applicationDbContext.TaskActivities.Add(activity);
+        applicationDbContext.TodoActivities.Add(activity);
 
         await applicationDbContext.SaveChangesAsync(cancellationToken);
     }

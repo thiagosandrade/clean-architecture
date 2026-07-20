@@ -20,7 +20,7 @@ internal sealed class GetAttachmentFileQueryHandler(
             return Result.Failure<AttachmentFileResponse>(UserErrors.Unauthorized());
         }
 
-        TaskAttachment? attachment = await context.TaskAttachments
+        TodoAttachment? attachment = await context.TodoAttachments
             .SingleOrDefaultAsync(a => a.Id == query.AttachmentId && a.TodoItemId == query.TodoId, cancellationToken);
 
         if (attachment is null)

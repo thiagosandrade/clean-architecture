@@ -13,9 +13,9 @@ public interface IApplicationDbContext
     DbSet<TodoItem> TodoItems { get; }
     DbSet<TodoSubItem> TodoSubItems { get; }
     DbSet<Permission> Permissions { get; }
-    DbSet<TaskActivity> TaskActivities { get; }
-    DbSet<TaskDependency> TaskDependencies { get; }
-    DbSet<TaskAttachment> TaskAttachments { get; set; }
+    DbSet<TodoActivity> TodoActivities { get; }
+    DbSet<TodoDependency> TodoDependencies { get; }
+    DbSet<TodoAttachment> TodoAttachments { get; set; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

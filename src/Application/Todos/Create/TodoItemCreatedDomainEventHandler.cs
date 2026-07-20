@@ -33,7 +33,7 @@ internal sealed class TodoItemCreatedDomainEventHandler(
         
         context.TodoItems.Update(todoItem);
 
-        todoItem.Raise(new TaskActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.EmbeddingsGenerated, "Embeddings Generated", todoItem.UserId));
+        todoItem.Raise(new TodoActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.EmbeddingsGenerated, "Embeddings Generated", todoItem.UserId));
 
         await context.SaveChangesAsync(cancellationToken);
 

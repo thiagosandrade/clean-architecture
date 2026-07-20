@@ -37,7 +37,7 @@ internal sealed partial class TaskBreakdownCommandHandler(
 
         IReadOnlyCollection<string> subTasks = await subTaskEnrichmentService.GenerateSubTasksAsync(todoItem.Description, command.Strategy, command.Complexity, cancellationToken);
 
-        todoItem.Raise(new TaskActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.BreakdownGenerated, "BreakdownGenerated", todoItem.UserId));
+        todoItem.Raise(new TodoActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.BreakdownGenerated, "BreakdownGenerated", todoItem.UserId));
 
         return new BreakdownResponse(subTasks);
     }

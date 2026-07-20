@@ -4,9 +4,9 @@ using Domain.Todos;
 
 namespace Application.Todos.Activities.Get;
 
-public class GetTaskActivityResponse
+public class GetTodoActivityResponse
 {
-    public GetTaskActivityResponse(List<TaskActivity> resultActivities)
+    public GetTodoActivityResponse(List<TodoActivity> resultActivities)
     {
         Activities = resultActivities.Select(x => new ActivityResponse()
         {

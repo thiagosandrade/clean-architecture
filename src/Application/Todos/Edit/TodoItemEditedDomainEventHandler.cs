@@ -27,7 +27,7 @@ internal sealed class TodoItemEditedDomainEventHandler(
 
         context.TodoItems.Update(todoItem);
 
-        todoItem.Raise(new TaskActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.CategoriesGenerated, "Categories Generated", todoItem.UserId));
+        todoItem.Raise(new TodoActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.CategoriesGenerated, "Categories Generated", todoItem.UserId));
 
         await context.SaveChangesAsync(cancellationToken);
 

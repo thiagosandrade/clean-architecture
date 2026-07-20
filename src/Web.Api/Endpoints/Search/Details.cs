@@ -3,6 +3,7 @@ using Application.Search;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
 using SharedKernel;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Api.Endpoints.Search;
 
@@ -15,10 +16,10 @@ internal sealed class Details : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("search/details/{type}/{id:Guid}", async (
+        app.MapPost("search/details/{type}/{id:Guid}", async (
             string type,
             Guid id,
-            [AsParameters] SearchDetailRequest request,
+            [FromBody] SearchDetailRequest request,
             IQueryHandler<SearchDetailQuery, SearchDetailResponse> handler,
             CancellationToken cancellationToken) =>
         {

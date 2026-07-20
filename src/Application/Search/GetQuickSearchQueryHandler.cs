@@ -58,7 +58,7 @@ internal sealed class GetQuickSearchQueryHandler(
             })
             .ToListAsync(cancellationToken);
 
-        List<AttachmentSearchItem> attachments = await context.TaskAttachments
+        List<AttachmentSearchItem> attachments = await context.TodoAttachments
             .AsNoTracking()
             .Where(a =>
                 a.TodoItem.UserId == query.UserId &&

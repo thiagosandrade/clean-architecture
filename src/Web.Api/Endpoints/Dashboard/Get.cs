@@ -1,6 +1,7 @@
 using Application.Abstractions.Constants;
 using Application.Abstractions.Messaging;
 using Application.Dashboard;
+using Microsoft.AspNetCore.Mvc;
 using SharedKernel;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
@@ -16,8 +17,8 @@ internal sealed class Get : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("dashboard", async (
-            [AsParameters] GetDashboardRequest request,
+        app.MapPost("dashboard", async (
+            [FromBody] GetDashboardRequest request,
             IQueryHandler<GetDashboardQuery, DashboardResponse> handler,
             CancellationToken cancellationToken) =>
         {

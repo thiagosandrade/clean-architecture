@@ -63,7 +63,7 @@ internal sealed class EditTodoCommandHandler(
             todoItem.Raise(new TodoItemEditedDomainEvent(todoItem.Id));
         }
 
-        todoItem.Raise(new TaskActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.TaskUpdated, "Task Updated", user.Id));
+        todoItem.Raise(new TodoActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.TaskUpdated, "Task Updated", user.Id));
 
         await context.SaveChangesAsync(cancellationToken);
 

@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.TaskAttachments;
 
-public sealed class TaskAttachmentConfiguration : IEntityTypeConfiguration<TaskAttachment>
+public sealed class TodoAttachmentConfiguration : IEntityTypeConfiguration<TodoAttachment>
 {
-    public void Configure(EntityTypeBuilder<TaskAttachment> builder)
+    public void Configure(EntityTypeBuilder<TodoAttachment> builder)
     {
         builder.HasKey(x => x.Id);
 

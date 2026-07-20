@@ -5,7 +5,7 @@ using SharedKernel;
 
 namespace Domain.Todos;
 
-public sealed class TaskDependency : Entity
+public sealed class TodoDependency : Entity
 {
     public Guid Id { get; set; }
     
@@ -17,11 +17,11 @@ public sealed class TaskDependency : Entity
 
     public TodoItem DependsOnTodoItem { get; private set; } = null!;
 
-    private TaskDependency()
+    private TodoDependency()
     {
     }
 
-    public TaskDependency(Guid todoItemId, Guid dependsOnTodoItemId)
+    public TodoDependency(Guid todoItemId, Guid dependsOnTodoItemId)
     {
         TodoItemId = todoItemId;
         DependsOnTodoItemId = dependsOnTodoItemId;

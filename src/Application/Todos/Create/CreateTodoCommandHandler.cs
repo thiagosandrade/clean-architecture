@@ -45,7 +45,7 @@ internal sealed class CreateTodoCommandHandler(
 
         todoItem.Raise(new TodoItemCreatedDomainEvent(todoItem.Id));
         
-        todoItem.Raise(new TaskActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.TaskCreated, "Task Created", user.Id));
+        todoItem.Raise(new TodoActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.TaskCreated, "Task Created", user.Id));
         
         return todoItem.Id;
     }

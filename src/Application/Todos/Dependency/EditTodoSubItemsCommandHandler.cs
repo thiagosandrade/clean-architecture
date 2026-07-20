@@ -67,11 +67,11 @@ internal sealed class EditTodoDependenciesCommandHandler(
             .ToHashSet();
 
         // 1. Remove deleted items
-        foreach (TaskDependency? dependency in todoItem.Dependencies
+        foreach (TodoDependency? dependency in todoItem.Dependencies
              .Where(x => !incoming.Contains(x.DependsOnTodoItemId))
              .ToList())
         {
-            context.TaskDependencies.Remove(dependency);
+            context.TodoDependencies.Remove(dependency);
         }
 
         // 2. Insert new
@@ -84,7 +84,7 @@ internal sealed class EditTodoDependenciesCommandHandler(
 
         todoItem.Raise(new TaskDependencyEditedDomainEvent(todoItem.Id));
 
-        todoItem.Raise(new TaskActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.DependencyUpdated, "Dependency Updated", user.Id));
+        todoItem.Raise(new TodoActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.DependencyUpdated, "Dependency Updated", user.Id));
 
         await context.SaveChangesAsync(cancellationToken);
 

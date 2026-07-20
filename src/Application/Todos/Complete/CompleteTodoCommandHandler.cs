@@ -34,7 +34,7 @@ internal sealed class CompleteTodoCommandHandler(
 
         todoItem.Raise(new TodoItemCompletedDomainEvent(todoItem.Id));
 
-        todoItem.Raise(new TaskActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.TaskCompleted, "Task Completed", todoItem.UserId));
+        todoItem.Raise(new TodoActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.TaskCompleted, "Task Completed", todoItem.UserId));
 
         await context.SaveChangesAsync(cancellationToken);
 

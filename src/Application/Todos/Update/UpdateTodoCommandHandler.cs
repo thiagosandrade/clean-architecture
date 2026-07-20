@@ -25,7 +25,7 @@ internal sealed class UpdateTodoCommandHandler(
         todoItem.Description = command.Description;
         todoItem.UpdatedOn = dateTimeProvider.UtcNow;
 
-        todoItem.Raise(new TaskActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.TaskUpdated, "Subtask Updated", todoItem.UserId));
+        todoItem.Raise(new TodoActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.TaskUpdated, "Subtask Updated", todoItem.UserId));
 
         await context.SaveChangesAsync(cancellationToken);
 
