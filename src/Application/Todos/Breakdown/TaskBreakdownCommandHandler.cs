@@ -1,18 +1,20 @@
-﻿using Application.OpenAI.Enrichment;
-using Domain;
+﻿using Application.Common.Interfaces;
+using Application.OpenAI.Enrichment;
+using Application.RabbitMq.Configuration;
+using Application.RabbitMq.Events;
 using Domain.Activities;
+using Domain.API;
 using Domain.Todos;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel.Abstractions.Data;
 using SharedKernel.Abstractions.Messaging;
-using SharedKernel.Authentication;
 
 namespace Application.Todos.Breakdown;
 
 internal sealed partial class TaskBreakdownCommandHandler(
     IApplicationDbContext context,
     ISubTaskEnrichmentService subTaskEnrichmentService,
+    IRabbitMqPublisher publisher,
     IUserContext userContext)
     : ICommandHandler<TaskBreakdownCommand, BreakdownResponse>
 {
@@ -38,6 +40,8 @@ internal sealed partial class TaskBreakdownCommandHandler(
         IReadOnlyCollection<string> subTasks = await subTaskEnrichmentService.GenerateSubTasksAsync(todoItem.Description, command.Strategy, command.Complexity, cancellationToken);
 
         todoItem.Raise(new TodoActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.BreakdownGenerated, "BreakdownGenerated", todoItem.UserId));
+
+        await publisher.PublishAsync(new TodoBreakdownIntegrationEvent(todoItem.Id, todoItem.UserId, todoItem.Description), cancellationToken);
 
         return new BreakdownResponse(subTasks);
     }

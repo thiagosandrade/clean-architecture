@@ -1,28 +1,22 @@
-using Domain;
+using Application.Common.Interfaces;
+using Domain.API;
 using Domain.Todos;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel.Abstractions.Data;
 using SharedKernel.Abstractions.Messaging;
-using SharedKernel.Authentication;
 
 namespace Application.Search;
 
-internal sealed class GetSearchDetailQueryHandler(IApplicationDbContext context, IUserContext userContext)
-    : IQueryHandler<SearchDetailQuery, SearchDetailResponse>
+internal sealed class GetSearchDetailQueryHandler(IApplicationDbContext context)
+    : IQueryHandler<GetSearchDetailQuery, SearchDetailResponse>
 {
     private const string TODOITEM = "TODOITEM";
     private const string TODOSUBITEM = "TODOSUBITEM";
     private const string ATTACHMENT = "ATTACHMENT";
     private const string USER = "USER";
 
-    public async Task<Result<SearchDetailResponse>> Handle(SearchDetailQuery query, CancellationToken cancellationToken)
+    public async Task<Result<SearchDetailResponse>> Handle(GetSearchDetailQuery query, CancellationToken cancellationToken)
     {
-        if (query.UserId != userContext.UserId)
-        {
-            return Result.Failure<SearchDetailResponse>(UserErrors.Unauthorized());
-        }
-
         string type = (query.Type ?? string.Empty).Trim().ToUpperInvariant();
 
         if (type == TODOITEM)
@@ -48,7 +42,7 @@ internal sealed class GetSearchDetailQueryHandler(IApplicationDbContext context,
         return Result.Failure<SearchDetailResponse>(UserErrors.NotFound(query.Id));
     }
 
-    private async Task<Result<SearchDetailResponse>> HandleTodoItem(SearchDetailQuery query, CancellationToken cancellationToken)
+    private async Task<Result<SearchDetailResponse>> HandleTodoItem(GetSearchDetailQuery query, CancellationToken cancellationToken)
     {
         TodoItem? todo = await context.TodoItems
             .AsNoTracking()
@@ -119,7 +113,7 @@ internal sealed class GetSearchDetailQueryHandler(IApplicationDbContext context,
         return response;
     }
 
-    private async Task<Result<SearchDetailResponse>> HandleSubItem(SearchDetailQuery query, CancellationToken cancellationToken)
+    private async Task<Result<SearchDetailResponse>> HandleSubItem(GetSearchDetailQuery query, CancellationToken cancellationToken)
     {
         TodoSubItem? subItem = await context.TodoSubItems
             .AsNoTracking()
@@ -164,9 +158,9 @@ internal sealed class GetSearchDetailQueryHandler(IApplicationDbContext context,
         return response;
     }
 
-    private async Task<Result<SearchDetailResponse>> HandleAttachment(SearchDetailQuery query, CancellationToken cancellationToken)
+    private async Task<Result<SearchDetailResponse>> HandleAttachment(GetSearchDetailQuery query, CancellationToken cancellationToken)
     {
-        Domain.Todos.TodoAttachment? attachment = await context.TodoAttachments
+        TodoAttachment? attachment = await context.TodoAttachments
             .AsNoTracking()
             .Where(a => a.Id == query.Id)
             .SingleOrDefaultAsync(cancellationToken);
@@ -209,14 +203,8 @@ internal sealed class GetSearchDetailQueryHandler(IApplicationDbContext context,
         return response;
     }
 
-    private async Task<Result<SearchDetailResponse>> HandleUser(SearchDetailQuery query, CancellationToken cancellationToken)
+    private async Task<Result<SearchDetailResponse>> HandleUser(GetSearchDetailQuery query, CancellationToken cancellationToken)
     {
-        // Only allow retrieving user details for the current user
-        if (query.Id != query.UserId)
-        {
-            return Result.Failure<SearchDetailResponse>(UserErrors.Unauthorized());
-        }
-
         var userEntity = await context.Users
             .AsNoTracking()
             .Where(u => u.Id == query.Id)

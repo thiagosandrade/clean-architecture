@@ -15,6 +15,6 @@
     <PackageReference Include="Swashbuckle.AspNetCore" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Domain\Domain.csproj" />
+    <Folder Include="Abstractions\Data\" />
   </ItemGroup>
 </Project>

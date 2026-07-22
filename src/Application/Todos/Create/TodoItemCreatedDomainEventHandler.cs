@@ -1,11 +1,11 @@
-﻿using Application.OpenAI.Embeddings;
+﻿using Application.Common.Extensions;
+using Application.Common.Interfaces;
+using Application.OpenAI.Embeddings;
 using Application.OpenAI.Enrichment;
-using Domain;
 using Domain.Activities;
+using Domain.DomainEvents;
 using Domain.Todos;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel.Abstractions.Data;
-using SharedKernel.Abstractions.Extensions;
 
 namespace Application.Todos.Create;
 

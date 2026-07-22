@@ -1,9 +1,8 @@
-﻿using Domain;
+﻿using Application.Common.Interfaces;
+using Domain.API;
 using Domain.Todos;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel.Abstractions.Data;
 using SharedKernel.Abstractions.Messaging;
-using SharedKernel.Authentication;
 
 namespace Application.Todos.GetById;
 

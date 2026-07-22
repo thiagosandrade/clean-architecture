@@ -1,9 +1,9 @@
-﻿using Application.OpenAI.Enrichment;
-using Domain;
+﻿using Application.Common.Interfaces;
+using Application.OpenAI.Enrichment;
 using Domain.Activities;
+using Domain.DomainEvents;
 using Domain.Todos;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel.Abstractions.Data;
 
 namespace Application.Todos.Edit;
 

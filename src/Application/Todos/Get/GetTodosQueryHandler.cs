@@ -1,9 +1,8 @@
-﻿using Domain;
+﻿using Application.Common.Interfaces;
+using Domain.API;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel.Abstractions.Data;
 using SharedKernel.Abstractions.Messaging;
-using SharedKernel.Authentication;
 using System.Linq.Dynamic.Core;
 
 namespace Application.Todos.Get;

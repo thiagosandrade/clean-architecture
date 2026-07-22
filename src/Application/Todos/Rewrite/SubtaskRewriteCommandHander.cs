@@ -1,18 +1,20 @@
-﻿using Application.OpenAI.Enrichment;
-using Domain;
+﻿using Application.Common.Interfaces;
+using Application.OpenAI.Enrichment;
+using Application.RabbitMq.Configuration;
+using Application.RabbitMq.Events;
 using Domain.Activities;
+using Domain.API;
 using Domain.Todos;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel.Abstractions.Data;
 using SharedKernel.Abstractions.Messaging;
-using SharedKernel.Authentication;
 
 namespace Application.Todos.Rewrite;
 
 internal sealed class SubtaskRewriteCommandHander(
     IApplicationDbContext context,
     IRewriteEnrichmentService subtaskRewriteService,
+    IRabbitMqPublisher publisher,
     IUserContext userContext)
     : ICommandHandler<SubtaskRewriteCommand, SubtaskRewriteResponse>
 {
@@ -42,6 +44,8 @@ internal sealed class SubtaskRewriteCommandHander(
         SubtaskRewriteResponse response = await subtaskRewriteService.RewriteAsync(command.Description, command.Style, cancellationToken);
 
         todoItem.Raise(new TodoActivityLogRequestedDomainEvent(command.TodoId, TaskActivityType.DescriptionRewritten, "Description Rewritten but not saved yet", user.Id));
+
+        await publisher.PublishAsync(new TodoUpdatedIntegrationEvent(todoItem.Id, todoItem.UserId, todoItem.Description), cancellationToken);
 
         return Result.Success<SubtaskRewriteResponse>(response);
     }

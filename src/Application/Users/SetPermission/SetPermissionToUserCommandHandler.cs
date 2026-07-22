@@ -1,12 +1,15 @@
-﻿using Domain;
+﻿using Application.Common.Interfaces;
+using Application.RabbitMq.Configuration;
+using Application.RabbitMq.Events;
+using Domain.API;
 using Domain.Users;
+using Elastic.Clients.Elasticsearch.Security;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel.Abstractions.Data;
 using SharedKernel.Abstractions.Messaging;
 
 namespace Application.Users.SetPermission;
 
-internal sealed class SetPermissionToUserCommandHandler(IApplicationDbContext context)
+internal sealed class SetPermissionToUserCommandHandler(IRabbitMqPublisher publisher, IApplicationDbContext context)
     : ICommandHandler<SetPermissionToUserCommand, Guid>
 {
     public async Task<Result<Guid>> Handle(SetPermissionToUserCommand command, CancellationToken cancellationToken)
@@ -37,6 +40,8 @@ internal sealed class SetPermissionToUserCommandHandler(IApplicationDbContext co
         await context.SaveChangesAsync(cancellationToken);
 
         permission.Raise(new SetPermissionToUserDomainEvent(permission.UserId, permission.Id));
+
+        await publisher.PublishAsync(new UserUpdatedIntegrationEvent(command.UserId), cancellationToken);
 
         return permission.Id;
     }

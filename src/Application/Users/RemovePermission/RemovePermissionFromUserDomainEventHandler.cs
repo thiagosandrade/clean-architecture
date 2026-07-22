@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.DomainEvents;
 using Domain.Users;
 
 namespace Application.Users.RemovePermission;

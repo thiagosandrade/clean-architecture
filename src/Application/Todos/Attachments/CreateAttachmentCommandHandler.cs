@@ -1,17 +1,19 @@
-using Domain;
+using Application.Common.Interfaces;
+using Application.RabbitMq.Configuration;
+using Application.RabbitMq.Events;
 using Domain.Activities;
+using Domain.API;
 using Domain.Todos;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel.Abstractions.Data;
 using SharedKernel.Abstractions.Messaging;
-using SharedKernel.Authentication;
 
 namespace Application.Todos.Attachments;
 
 internal sealed class CreateAttachmentCommandHandler(
     IApplicationDbContext context,
     IDateTimeProvider provider,
+    IRabbitMqPublisher publisher,
     IUserContext userContext)
     : ICommandHandler<CreateAttachmentCommand, Guid>
 {
@@ -48,6 +50,8 @@ internal sealed class CreateAttachmentCommandHandler(
         todo.Raise(new TodoActivityLogRequestedDomainEvent(todo.Id, TaskActivityType.AttachmentAdded, "Attachment Added", userContext.UserId));
 
         await context.SaveChangesAsync(cancellationToken);
+
+        await publisher.PublishAsync(new TodoAttachmentIntegrationEvent(todo.Id, todo.UserId, todo.Description),cancellationToken);
 
         return attachment.Id;
     }

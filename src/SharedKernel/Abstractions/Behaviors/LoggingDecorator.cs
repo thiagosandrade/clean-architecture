@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.API;
 using Microsoft.Extensions.Logging;
 using Serilog.Context;
 using SharedKernel.Abstractions.Messaging;

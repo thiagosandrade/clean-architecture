@@ -1,16 +1,18 @@
-using Domain;
+using Application.Common.Interfaces;
+using Application.RabbitMq.Configuration;
+using Application.RabbitMq.Events;
 using Domain.Activities;
+using Domain.API;
 using Domain.Todos;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel.Abstractions.Data;
 using SharedKernel.Abstractions.Messaging;
-using SharedKernel.Authentication;
 
 namespace Application.Todos.Attachments;
 
 internal sealed class DeleteAttachmentCommandHandler(
     IApplicationDbContext context,
+    IRabbitMqPublisher publisher,
     IUserContext userContext)
     : ICommandHandler<DeleteAttachmentCommand>
 {
@@ -43,6 +45,8 @@ internal sealed class DeleteAttachmentCommandHandler(
         todo.Raise(new TodoActivityLogRequestedDomainEvent(todo.Id, TaskActivityType.AttachmentDeleted, "Attachment Deleted", userContext.UserId));
 
         await context.SaveChangesAsync(cancellationToken);
+
+        await publisher.PublishAsync(new TodoAttachmentIntegrationEvent(todo.Id, todo.UserId, todo.Description), cancellationToken);
 
         return Result.Success();
     }

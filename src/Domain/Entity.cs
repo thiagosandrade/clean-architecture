@@ -1,4 +1,6 @@
-﻿namespace Domain;
+﻿using Domain.DomainEvents;
+
+namespace Domain;
 
 public abstract class Entity
 {

@@ -1,4 +1,6 @@
-﻿namespace Domain.Users;
+﻿using SharedKernel.Common;
+
+namespace Domain.Users;
 
 public static class UserErrors
 {

@@ -1,14 +1,16 @@
-﻿using Domain;
+﻿using Application.Common.Interfaces;
+using Application.RabbitMq.Configuration;
+using Application.RabbitMq.Events;
+using Domain.API;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel.Abstractions.Data;
 using SharedKernel.Abstractions.Messaging;
-using SharedKernel.Authentication;
 
 namespace Application.Users.Update;
 
 internal sealed class UpdateUserCommandHandler(
-    IApplicationDbContext context, 
+    IApplicationDbContext context,
+    IRabbitMqPublisher publisher,
     IPasswordHasher passwordHasher,
     IDateTimeProvider dateTimeProvider)
     : ICommandHandler<UpdateUserCommand, Guid>
@@ -38,6 +40,8 @@ internal sealed class UpdateUserCommandHandler(
         context.Users.Update(user);
 
         await context.SaveChangesAsync(cancellationToken);
+
+        await publisher.PublishAsync(new UserUpdatedIntegrationEvent(user.Id), cancellationToken);
 
         return user.Id;
     }

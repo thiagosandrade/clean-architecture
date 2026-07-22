@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.API;
 using SharedKernel.Abstractions.Messaging;
 
 namespace Application.Todos.Search;

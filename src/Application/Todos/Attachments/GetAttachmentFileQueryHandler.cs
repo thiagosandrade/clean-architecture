@@ -1,10 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Domain.Users;
 using Domain.Todos;
-using SharedKernel.Authentication;
-using SharedKernel.Abstractions.Data;
 using SharedKernel.Abstractions.Messaging;
-using Domain;
+using Domain.API;
+using Application.Common.Interfaces;
 
 namespace Application.Todos.Attachments;
 

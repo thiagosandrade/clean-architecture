@@ -1,4 +1,6 @@
-﻿namespace Domain.Todos;
+﻿using SharedKernel.Common;
+
+namespace Domain.Todos;
 
 public static class TodoItemErrors
 {

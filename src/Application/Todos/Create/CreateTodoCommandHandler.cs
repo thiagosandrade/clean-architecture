@@ -1,16 +1,18 @@
-﻿using Domain;
+﻿using Application.Common.Interfaces;
+using Application.RabbitMq.Configuration;
+using Application.RabbitMq.Events;
 using Domain.Activities;
+using Domain.API;
 using Domain.Todos;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel.Abstractions.Data;
 using SharedKernel.Abstractions.Messaging;
-using SharedKernel.Authentication;
 
 namespace Application.Todos.Create;
 
 internal sealed class CreateTodoCommandHandler(
     IApplicationDbContext context,
+    IRabbitMqPublisher publisher,
     IUserContext userContext)
     : ICommandHandler<CreateTodoCommand, Guid>
 {
@@ -46,7 +48,9 @@ internal sealed class CreateTodoCommandHandler(
         todoItem.Raise(new TodoItemCreatedDomainEvent(todoItem.Id));
         
         todoItem.Raise(new TodoActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.TaskCreated, "Task Created", user.Id));
-        
+
+        await publisher.PublishAsync(new TodoCreatedIntegrationEvent(todoItem.Id, todoItem.UserId, todoItem.Description), cancellationToken);
+
         return todoItem.Id;
     }
 }

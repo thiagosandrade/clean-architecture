@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.API;
 
 namespace SharedKernel.Abstractions.Messaging;
 

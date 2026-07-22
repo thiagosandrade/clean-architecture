@@ -1,12 +1,14 @@
-﻿using Domain;
+﻿using Application.Common.Interfaces;
+using Application.RabbitMq.Configuration;
+using Application.RabbitMq.Events;
+using Domain.API;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel.Abstractions.Data;
 using SharedKernel.Abstractions.Messaging;
 
 namespace Application.Users.RemovePermission;
 
-internal sealed class RemovePermissionFromUserCommandHandler(IApplicationDbContext context)
+internal sealed class RemovePermissionFromUserCommandHandler(IRabbitMqPublisher publisher, IApplicationDbContext context)
     : ICommandHandler<RemovePermissionFromUserCommand, Guid>
 {
     public async Task<Result<Guid>> Handle(RemovePermissionFromUserCommand command, CancellationToken cancellationToken)
@@ -33,6 +35,8 @@ internal sealed class RemovePermissionFromUserCommandHandler(IApplicationDbConte
         await context.SaveChangesAsync(cancellationToken);
 
         userPermission.Raise(new RemovePermissionFromUserDomainEvent(userPermission.UserId, userPermission.Id));
+
+        await publisher.PublishAsync(new UserUpdatedIntegrationEvent(command.UserId), cancellationToken);
 
         return userPermission.Id;
     }

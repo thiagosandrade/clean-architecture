@@ -1,7 +1,8 @@
-﻿using Domain;
+﻿using Domain.API;
 using FluentValidation;
 using FluentValidation.Results;
 using SharedKernel.Abstractions.Messaging;
+using SharedKernel.Common;
 
 namespace SharedKernel.Abstractions.Behaviors;
 

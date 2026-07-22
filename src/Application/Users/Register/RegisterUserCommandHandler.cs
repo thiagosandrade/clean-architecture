@@ -1,10 +1,9 @@
-﻿using Domain;
+﻿using Application.Common.Interfaces;
+using Domain.API;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel.Abstractions.Constants;
-using SharedKernel.Abstractions.Data;
 using SharedKernel.Abstractions.Messaging;
-using SharedKernel.Authentication;
 
 namespace Application.Users.Register;
 
@@ -27,7 +26,7 @@ internal sealed class RegisterUserCommandHandler(IApplicationDbContext context, 
             PasswordHash = passwordHasher.Hash(command.Password)
         };
 
-        user.Raise(new UserRegisteredDomainEvent(user.Id));
+        user.Raise(new UserDomainEvents(user.Id));
 
         context.Users.Add(user);
 

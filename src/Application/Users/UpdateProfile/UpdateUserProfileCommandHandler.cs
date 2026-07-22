@@ -1,13 +1,16 @@
-using Domain;
+using Application.Common.Interfaces;
+using Application.RabbitMq.Configuration;
+using Application.RabbitMq.Events;
+using Domain.API;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel.Abstractions.Data;
 using SharedKernel.Abstractions.Messaging;
 
 namespace Application.Users.UpdateProfile;
 
 internal sealed class UpdateUserProfileCommandHandler(
     IApplicationDbContext context,
+    IRabbitMqPublisher publisher,
     IDateTimeProvider dateTimeProvider)
     : ICommandHandler<UpdateUserProfileCommand, Guid>
 {
@@ -37,6 +40,8 @@ internal sealed class UpdateUserProfileCommandHandler(
         context.Users.Update(user);
 
         await context.SaveChangesAsync(cancellationToken);
+
+        await publisher.PublishAsync(new UserUpdatedIntegrationEvent(user.Id), cancellationToken);
 
         return user.Id;
     }

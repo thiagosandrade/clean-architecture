@@ -1,12 +1,12 @@
 ﻿using System.Linq.Dynamic.Core;
+using Application.Common.Extensions;
+using Application.Common.Interfaces;
 using Application.OpenAI.Embeddings;
-using Domain;
+using Domain.API;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Pgvector;
 using Pgvector.EntityFrameworkCore;
-using SharedKernel.Abstractions.Data;
-using SharedKernel.Abstractions.Extensions;
 using SharedKernel.Abstractions.Messaging;
 
 namespace Application.Todos.Search;

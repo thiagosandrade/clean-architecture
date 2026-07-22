@@ -1,14 +1,18 @@
-using Domain;
+using Application.Common.Interfaces;
+using Application.RabbitMq.Configuration;
+using Application.RabbitMq.Events;
 using Domain.Activities;
+using Domain.API;
 using Domain.Todos;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel.Abstractions.Data;
 using SharedKernel.Abstractions.Messaging;
 
 namespace Application.Todos.Update;
 
 internal sealed class UpdateTodoCommandHandler(
-    IApplicationDbContext context, IDateTimeProvider dateTimeProvider)
+    IRabbitMqPublisher publisher,
+    IDateTimeProvider dateTimeProvider,
+    IApplicationDbContext context)
     : ICommandHandler<UpdateTodoCommand>
 {
     public async Task<Result> Handle(UpdateTodoCommand command, CancellationToken cancellationToken)
@@ -27,6 +31,8 @@ internal sealed class UpdateTodoCommandHandler(
         todoItem.Raise(new TodoActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.TaskUpdated, "Subtask Updated", todoItem.UserId));
 
         await context.SaveChangesAsync(cancellationToken);
+        
+        await publisher.PublishAsync(new TodoUpdatedIntegrationEvent(todoItem.Id, todoItem.UserId, todoItem.Description), cancellationToken);
 
         return Result.Success();
     }

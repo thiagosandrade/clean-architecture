@@ -1,12 +1,14 @@
-﻿using Domain;
+﻿using Application.Common.Interfaces;
+using Application.RabbitMq.Configuration;
+using Application.RabbitMq.Events;
+using Domain.API;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel.Abstractions.Data;
 using SharedKernel.Abstractions.Messaging;
 
 namespace Application.Users.Remove;
 
-internal sealed class RemoveUserCommandHandler(IApplicationDbContext context)
+internal sealed class RemoveUserCommandHandler(IRabbitMqPublisher publisher, IApplicationDbContext context)
     : ICommandHandler<RemoveUserCommand, Guid>
 {
     public async Task<Result<Guid>> Handle(RemoveUserCommand command, CancellationToken cancellationToken)
@@ -15,6 +17,7 @@ internal sealed class RemoveUserCommandHandler(IApplicationDbContext context)
         {
             return Result.Failure<Guid>(UserErrors.NotFound(command.UserId));
         }
+
         User user = await LoadUser(command, cancellationToken);
 
         user.Raise(new UserRemovedDomainEvent(user.Id));
@@ -22,6 +25,8 @@ internal sealed class RemoveUserCommandHandler(IApplicationDbContext context)
         context.Users.Remove(user);
 
         await context.SaveChangesAsync(cancellationToken);
+
+        await publisher.PublishAsync(new UserDeletedIntegrationEvent(user.Id), cancellationToken);
 
         return user.Id;
     }

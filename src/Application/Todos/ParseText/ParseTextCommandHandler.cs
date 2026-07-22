@@ -1,6 +1,6 @@
 ﻿using Application.OpenAI;
 using Application.OpenAI.Parser;
-using Domain;
+using Domain.API;
 using SharedKernel.Abstractions.Messaging;
 
 namespace Application.Todos.ParseText;

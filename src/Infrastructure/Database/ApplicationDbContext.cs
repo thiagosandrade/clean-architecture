@@ -1,12 +1,12 @@
-﻿using Domain;
+﻿using Application.Common.Interfaces;
+using Domain;
 using Domain.Activities;
+using Domain.DomainEvents;
 using Domain.Permissions;
 using Domain.Todos;
 using Domain.Users;
-using Infrastructure.DomainEvents;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
-using SharedKernel.Abstractions.Data;
 
 namespace Infrastructure.Database;
 

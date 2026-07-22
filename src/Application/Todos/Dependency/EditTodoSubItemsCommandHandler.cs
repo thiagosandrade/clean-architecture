@@ -1,17 +1,19 @@
-﻿using Domain;
+﻿using Application.Common.Interfaces;
+using Application.RabbitMq.Configuration;
+using Application.RabbitMq.Events;
 using Domain.Activities;
+using Domain.API;
 using Domain.Todos;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel.Abstractions.Data;
 using SharedKernel.Abstractions.Messaging;
-using SharedKernel.Authentication;
 
 namespace Application.Todos.Dependency;
 
 internal sealed class EditTodoDependenciesCommandHandler(
     IApplicationDbContext context,
     IDateTimeProvider dateTimeProvider,
+    IRabbitMqPublisher publisher,
     IUserContext userContext)
     : ICommandHandler<EditTodoDependenciesCommand, Guid>
 {
@@ -86,6 +88,8 @@ internal sealed class EditTodoDependenciesCommandHandler(
         todoItem.Raise(new TodoActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.DependencyUpdated, "Dependency Updated", user.Id));
 
         await context.SaveChangesAsync(cancellationToken);
+
+        await publisher.PublishAsync(new TodoUpdatedIntegrationEvent(todoItem.Id, todoItem.UserId, todoItem.Description), cancellationToken);
 
         return todoItem.Id;
     }

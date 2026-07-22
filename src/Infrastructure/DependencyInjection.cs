@@ -1,7 +1,9 @@
 ﻿using System.Text;
-using Domain;
+using Application.Common.Interfaces;
+using Domain.DomainEvents;
+using Infrastructure.Authentication;
+using Infrastructure.Authorization;
 using Infrastructure.Database;
-using Infrastructure.DomainEvents;
 using Infrastructure.Time;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -12,9 +14,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using SharedKernel;
-using SharedKernel.Abstractions.Data;
-using SharedKernel.Authentication;
-using SharedKernel.Authorization;
 
 namespace Infrastructure;
 

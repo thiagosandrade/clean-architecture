@@ -1,13 +1,14 @@
-﻿using Domain;
+﻿using Application.Common.Interfaces;
+using Application.RabbitMq.Configuration;
+using Application.RabbitMq.Events;
+using Domain.API;
 using Domain.Todos;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel.Abstractions.Data;
 using SharedKernel.Abstractions.Messaging;
-using SharedKernel.Authentication;
 
 namespace Application.Todos.Delete;
 
-internal sealed class DeleteTodoCommandHandler(IApplicationDbContext context, IUserContext userContext)
+internal sealed class DeleteTodoCommandHandler(IApplicationDbContext context, IRabbitMqPublisher publisher, IUserContext userContext)
     : ICommandHandler<DeleteTodoCommand>
 {
     public async Task<Result> Handle(DeleteTodoCommand command, CancellationToken cancellationToken)
@@ -25,6 +26,8 @@ internal sealed class DeleteTodoCommandHandler(IApplicationDbContext context, IU
         todoItem.Raise(new TodoItemDeletedDomainEvent(todoItem.Id));
 
         await context.SaveChangesAsync(cancellationToken);
+
+        await publisher.PublishAsync(new TodoDeletedIntegrationEvent(todoItem.Id, todoItem.UserId, todoItem.Description), cancellationToken);
 
         return Result.Success();
     }

@@ -1,9 +1,15 @@
 ﻿using Application.Elastic;
+using Application.Elastic.Extensions;
+using Application.Elastic.Services;
 using Application.OpenAI.Embeddings;
 using Application.OpenAI.Enrichment;
+using Application.OpenAI.Extensions;
 using Application.OpenAI.Parser;
+using Application.RabbitMq.Consumers;
+using Application.RabbitMq.Events;
+using Application.RabbitMq.Extensions;
 using Application.Todos.Activities.Log;
-using Domain;
+using Domain.DomainEvents;
 using Elastic.Clients.Elasticsearch;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
@@ -50,33 +56,42 @@ public static class DependencyInjection
         services.AddScoped<IRewriteEnrichmentService, RewriteEnrichmentService>();
         services.AddScoped<ITodoActivityService, TodoActivityService>();
 
-        // OpenAI
-        services.AddSingleton(new OpenAIClient(
-            configuration["AIConfig:OpenAIKey"]
-        ));
+        services.AddOpenAI(configuration);
+
+        services.AddElasticsearch(configuration);
+
+        services.AddRabbitMq(configuration);
 
         return services;
     }
 
     public static IServiceCollection AddDataProcessorApplication(this IServiceCollection services, IConfiguration configuration)
     {
-        services.Scan(scan => scan.FromAssembliesOf(typeof(DependencyInjection))
-            .AddClasses(classes => classes.AssignableTo(typeof(IDomainEventHandler<>)), publicOnly: false)
-            .AsImplementedInterfaces()
-            .WithScopedLifetime());
+        services.AddElasticsearch(configuration);
 
-        services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly, includeInternalTypes: true);
+        services.AddRabbitMq(configuration);
 
-        services.AddSingleton(_ =>
-        {
-            ElasticsearchClientSettings settings = new ElasticsearchClientSettings(
-                new Uri(configuration["Elasticsearch:Uri"]!))
-                .DefaultIndex("todos");
+        services.AddRabbitMqConsumer<TodoCreatedIntegrationEvent, TodoCreatedIntegrationEventHandler>(queue: "todo-created");
 
-            return new ElasticsearchClient(settings);
-        });
+        services.AddRabbitMqConsumer<TodoUpdatedIntegrationEvent, TodoUpdatedIntegrationEventHandler>(queue: "todo-updated");
 
-        services.AddScoped<IElasticSearchService, ElasticSearchService>();
+        services.AddRabbitMqConsumer<TodoDeletedIntegrationEvent, TodoDeletedIntegrationEventHandler>(queue: "todo-deleted");
+
+        services.AddRabbitMqConsumer<TodoAttachmentIntegrationEvent, TodoAttachmentIntegrationEventHandler>(queue: "todo-attachment");
+
+        services.AddRabbitMqConsumer<TodoBreakdownIntegrationEvent, TodoBreakdownIntegrationEventHandler>(queue: "todo-breakdown");
+
+        services.AddRabbitMqConsumer<TodoDependencyIntegrationEvent, TodoDependencyIntegrationEventHandler>(queue: "todo-dependency");
+
+        services.AddRabbitMqConsumer<TodoRewriteIntegrationEvent, TodoRewriteIntegrationEventHandler>(queue: "todo-rewrite");
+
+        services.AddRabbitMqConsumer<UserCreatedIntegrationEvent, UserCreatedIntegrationEventHandler>(queue: "user-created");
+
+        services.AddRabbitMqConsumer<UserUpdatedIntegrationEvent, UserUpdatedIntegrationEventHandler>(queue: "user-updated");
+
+        services.AddRabbitMqConsumer<UserDeletedIntegrationEvent, UserDeletedIntegrationEventHandler>(queue: "user-deleted");
+
+        services.AddHostedService<RebuildIndexHostedService>();
 
         return services;
     }

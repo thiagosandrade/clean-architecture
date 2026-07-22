@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Application.Common.Interfaces;
 using SharedKernel;
 
 namespace Infrastructure.Time;

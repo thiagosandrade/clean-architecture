@@ -1,5 +1,5 @@
-﻿using Domain;
-using Domain.Activities;
+﻿using Domain.Activities;
+using Domain.DomainEvents;
 
 namespace Application.Todos.Activities.Log;
 

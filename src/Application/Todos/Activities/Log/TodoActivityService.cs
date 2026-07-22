@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
-using Domain;
+using Application.Common.Interfaces;
 using Domain.Activities;
-using SharedKernel.Abstractions.Data;
 
 namespace Application.Todos.Activities.Log;
 
