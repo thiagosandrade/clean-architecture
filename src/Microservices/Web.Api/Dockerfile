@@ -14,15 +14,20 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Directory.Packages.props", "."]
 COPY ["Directory.Build.props", "."]
-COPY ["src/Web.Api/Web.Api.csproj", "src/Web.Api/"]
+
+COPY ["src/Microservices/Web.Api/Web.Api.csproj", "src/Microservices/Web.Api/"]
 COPY ["src/Infrastructure/Infrastructure.csproj", "src/Infrastructure/"]
 COPY ["src/Application/Application.csproj", "src/Application/"]
 COPY ["src/Domain/Domain.csproj", "src/Domain/"]
 COPY ["src/SharedKernel/SharedKernel.csproj", "src/SharedKernel/"]
-RUN dotnet restore "./src/Web.Api/Web.Api.csproj"
+
+RUN dotnet restore "src/Microservices/Web.Api/Web.Api.csproj"
+
 COPY . .
-WORKDIR "/src/src/Web.Api"
-RUN dotnet build "./Web.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+WORKDIR "/src/src/Microservices/Web.Api"
+
+RUN dotnet build "Web.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish

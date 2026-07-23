@@ -2,6 +2,9 @@
 
 namespace Application.RabbitMq.Events;
 
+[RabbitMqEvent(exchange: "todos", routingKey: "todo.embedding-requested")]
+public sealed record TodoEmbeddingRequestedIntegrationEvent(Guid TodoId, Guid UserId, string Description) : IIntegrationEvent;
+
 [RabbitMqEvent(exchange: "todos", routingKey: "todo.created")]
 public sealed record TodoCreatedIntegrationEvent(Guid TodoId, Guid UserId, string Description) : IIntegrationEvent;
 

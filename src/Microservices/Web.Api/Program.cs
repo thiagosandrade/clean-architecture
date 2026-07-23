@@ -29,14 +29,11 @@ app.UseCors();
 
 app.MapEndpoints();
 
-if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Docker"))
-{
-    app.UseSwaggerWithUi();
+app.UseSwaggerWithUi();
 
-    app.ApplyMigrations();
-}
+app.ApplyMigrations();
 
-if (app.Environment.IsEnvironment("Docker"))
+if (app.Environment.IsEnvironment("Development") || app.Environment.IsEnvironment("Docker") || app.Environment.IsEnvironment("Test"))
 {
     app.UseHttpsRedirection();
 }

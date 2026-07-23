@@ -1,9 +1,10 @@
 ﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Domain.DomainEvents;
 
-public sealed class DomainEventsDispatcher(IServiceProvider serviceProvider) : IDomainEventsDispatcher
+public sealed class DomainEventsDispatcher(IServiceProvider serviceProvider, ILogger<DomainEventsDispatcher> logger) : IDomainEventsDispatcher
 {
     private static readonly ConcurrentDictionary<Type, Type> HandlerTypeDictionary = new();
     private static readonly ConcurrentDictionary<Type, Type> WrapperTypeDictionary = new();
@@ -14,26 +15,36 @@ public sealed class DomainEventsDispatcher(IServiceProvider serviceProvider) : I
     {
         foreach (IDomainEvent domainEvent in domainEvents)
         {
-            using IServiceScope scope = serviceProvider.CreateScope();
-
-            Type domainEventType = domainEvent.GetType();
-            Type handlerType = HandlerTypeDictionary.GetOrAdd(
-                domainEventType,
-                et => typeof(IDomainEventHandler<>).MakeGenericType(et));
-
-            IEnumerable<object?> handlers = scope.ServiceProvider.GetServices(handlerType);
-
-            foreach (object? handler in handlers)
+            try
             {
-                if (handler is null)
+                using IServiceScope scope = serviceProvider.CreateScope();
+
+                Type domainEventType = domainEvent.GetType();
+                Type handlerType = HandlerTypeDictionary.GetOrAdd(
+                    domainEventType,
+                    et => typeof(IDomainEventHandler<>).MakeGenericType(et));
+
+                IEnumerable<object?> handlers = scope.ServiceProvider.GetServices(handlerType);
+
+                foreach (object? handler in handlers)
                 {
-                    continue;
+                    if (handler is null)
+                    {
+                        continue;
+                    }
+
+                    var handlerWrapper = HandlerWrapper.Create(handler, domainEventType);
+
+                    await handlerWrapper.Handle(domainEvent, cancellationToken);
                 }
-
-                var handlerWrapper = HandlerWrapper.Create(handler, domainEventType);
-
-                await handlerWrapper.Handle(domainEvent, cancellationToken);
             }
+            catch (Exception ex)
+            {
+                logger.LogError($"Domain Events dispatcher error: {ex.Message} - {ex.InnerException}");
+
+                throw;
+            }
+            
         }
     }
 

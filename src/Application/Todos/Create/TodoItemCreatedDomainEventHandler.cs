@@ -9,32 +9,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Todos.Create;
 
-internal sealed class TodoItemCreatedDomainEventHandler(
-    IApplicationDbContext context, 
-    ICategoryEnrichmentService categoryEnrichmentService,
-    IEmbeddingsService embeddingsService,
-    IDateTimeProvider dateTimeProvider) 
+internal sealed class TodoItemCreatedDomainEventHandler() 
     : IDomainEventHandler<TodoItemCreatedDomainEvent>
 {
     public async Task Handle(TodoItemCreatedDomainEvent domainEvent, CancellationToken cancellationToken)
     {
-        TodoItem todoItem = await context.TodoItems.FirstAsync(x => x.Id == domainEvent.TodoItemId, cancellationToken: cancellationToken);
-
-        IReadOnlyCollection<string> categories = await categoryEnrichmentService.EnrichAsync(todoItem.Description, todoItem.Labels, cancellationToken);
-
-        float[] embedding = await embeddingsService.GenerateEmbeddingsAsync(todoItem.Description, [.. todoItem.Labels], categories);
-
-        todoItem.Embedding = embedding.ToVector();
-        todoItem.Categories = [.. categories];
-
-        todoItem.UpdatedOn = dateTimeProvider.UtcNow;
         
-        context.TodoItems.Update(todoItem);
-
-        todoItem.Raise(new TodoActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.EmbeddingsGenerated, "Embeddings Generated", todoItem.UserId));
-
-        await context.SaveChangesAsync(cancellationToken);
-
-        // TODO: Send an email verification link, etc.
     }
 }

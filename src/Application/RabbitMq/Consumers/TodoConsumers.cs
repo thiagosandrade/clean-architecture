@@ -1,12 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Application.Common.Extensions;
+using Application.Common.Interfaces;
 using Application.Elastic.Services;
+using Application.OpenAI.Embeddings;
+using Application.OpenAI.Enrichment;
 using Application.RabbitMq.Configuration;
 using Application.RabbitMq.Events;
-using Elastic.Clients.Elasticsearch.Inference;
+using Domain.Activities;
+using Domain.DomainEvents;
+using Domain.Todos;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace Application.RabbitMq.Consumers;
+
+internal sealed class TodoEmbeddingRequestedIntegrationEventHandler(
+    IApplicationDbContext context,
+    ICategoryEnrichmentService categoryEnrichmentService,
+    IRabbitMqPublisher publisher,
+    IEmbeddingsService embeddingsService,
+    IDateTimeProvider dateTimeProvider) : IIntegrationEventHandler<TodoEmbeddingRequestedIntegrationEvent>
+{
+    public async Task Handle(TodoEmbeddingRequestedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    {
+        TodoItem todoItem = await context.TodoItems.FirstAsync(x => x.Id == integrationEvent.TodoId, cancellationToken: cancellationToken);
+
+        IReadOnlyCollection<string> categories = await categoryEnrichmentService.EnrichAsync(todoItem.Description, todoItem.Labels, cancellationToken);
+
+        float[] embedding = await embeddingsService.GenerateEmbeddingsAsync(todoItem.Description, [.. todoItem.Labels], categories);
+
+        todoItem.Embedding = embedding.ToVector();
+        todoItem.Categories = [.. categories];
+
+        todoItem.UpdatedOn = dateTimeProvider.UtcNow;
+
+        context.TodoItems.Update(todoItem);
+
+        todoItem.Raise(new TodoActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.EmbeddingsGenerated, "Embeddings Generated", todoItem.UserId));
+
+        await context.SaveChangesAsync(cancellationToken);
+
+        await publisher.PublishAsync(new TodoCreatedIntegrationEvent(todoItem.Id, todoItem.UserId, todoItem.Description), cancellationToken);
+    }
+}
 
 internal sealed class TodoCreatedIntegrationEventHandler(IElasticTodoSearchService elasticSearchService) : IIntegrationEventHandler<TodoCreatedIntegrationEvent>
 {

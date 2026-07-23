@@ -24,6 +24,79 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddBackendApplication(this IServiceCollection services, IConfiguration configuration)
     {
+        AddCQRSAssemblies(services);
+
+        AddDomainHandlers(services);
+
+        services.AddOpenAI(configuration);
+
+        services.AddScoped<IEmbeddingsService, EmbeddingsService>();
+        services.AddScoped<ICategoryEnrichmentService, CategoryEnrichmentService>();
+        services.AddScoped<IParseTodoEnrichmentService, ParseTodoEnrichmentService>();
+        services.AddScoped<ISubTaskEnrichmentService, SubTaskEnrichmentService>();
+        services.AddScoped<IRewriteEnrichmentService, RewriteEnrichmentService>();
+        services.AddScoped<ITodoActivityService, TodoActivityService>();
+
+        services.AddElasticsearch(configuration);
+
+        services.AddRabbitMq(configuration);
+
+        return services;
+    }
+
+    public static IServiceCollection AddDataProcessorApplication(this IServiceCollection services, IConfiguration configuration)
+    {
+        AddCQRSAssemblies(services);
+
+        AddDomainHandlers(services);
+
+        services.AddOpenAI(configuration);
+
+        services.AddScoped<IEmbeddingsService, EmbeddingsService>();
+        services.AddScoped<ICategoryEnrichmentService, CategoryEnrichmentService>();
+        services.AddScoped<ITodoActivityService, TodoActivityService>();
+
+        services.AddElasticsearch(configuration);
+
+        services.AddRabbitMq(configuration);
+
+        services.AddRabbitMqConsumer<TodoEmbeddingRequestedIntegrationEvent, TodoEmbeddingRequestedIntegrationEventHandler>(queue: "dataprocessor--todo-embedding-requested");
+
+        services.AddRabbitMqConsumer<TodoCreatedIntegrationEvent, TodoCreatedIntegrationEventHandler>(queue: "dataprocessor--todo-created");
+
+        services.AddRabbitMqConsumer<TodoUpdatedIntegrationEvent, TodoUpdatedIntegrationEventHandler>(queue: "dataprocessor--todo-updated");
+
+        services.AddRabbitMqConsumer<TodoDeletedIntegrationEvent, TodoDeletedIntegrationEventHandler>(queue: "dataprocessor--todo-deleted");
+
+        services.AddRabbitMqConsumer<TodoAttachmentIntegrationEvent, TodoAttachmentIntegrationEventHandler>(queue: "dataprocessor--todo-attachment-added");
+
+        services.AddRabbitMqConsumer<TodoBreakdownIntegrationEvent, TodoBreakdownIntegrationEventHandler>(queue: "dataprocessor--todo-breakdown-executed");
+
+        services.AddRabbitMqConsumer<TodoDependencyIntegrationEvent, TodoDependencyIntegrationEventHandler>(queue: "dataprocessor--todo-dependency-updated");
+
+        services.AddRabbitMqConsumer<TodoRewriteIntegrationEvent, TodoRewriteIntegrationEventHandler>(queue: "dataprocessor--todo-rewrite-executed");
+
+        services.AddRabbitMqConsumer<UserCreatedIntegrationEvent, UserCreatedIntegrationEventHandler>(queue: "dataprocessor--user-created");
+
+        services.AddRabbitMqConsumer<UserUpdatedIntegrationEvent, UserUpdatedIntegrationEventHandler>(queue: "dataprocessor--user-updated");
+
+        services.AddRabbitMqConsumer<UserDeletedIntegrationEvent, UserDeletedIntegrationEventHandler>(queue: "dataprocessor--user-deleted");
+
+        services.AddHostedService<RebuildIndexHostedService>();
+
+        return services;
+    }
+
+    private static void AddDomainHandlers(IServiceCollection services)
+    {
+        services.Scan(scan => scan.FromAssembliesOf(typeof(DependencyInjection))
+            .AddClasses(classes => classes.AssignableTo(typeof(IDomainEventHandler<>)), publicOnly: false)
+            .AsImplementedInterfaces()
+            .WithScopedLifetime());
+    }
+
+    private static void AddCQRSAssemblies(IServiceCollection services)
+    {
         services.Scan(scan => scan.FromAssembliesOf(typeof(DependencyInjection))
             .AddClasses(classes => classes.AssignableTo(typeof(IQueryHandler<,>)), publicOnly: false)
                 .AsImplementedInterfaces()
@@ -42,57 +115,6 @@ public static class DependencyInjection
         services.Decorate(typeof(ICommandHandler<,>), typeof(LoggingDecorator.CommandHandler<,>));
         services.Decorate(typeof(ICommandHandler<>), typeof(LoggingDecorator.CommandBaseHandler<>));
 
-        services.Scan(scan => scan.FromAssembliesOf(typeof(DependencyInjection))
-            .AddClasses(classes => classes.AssignableTo(typeof(IDomainEventHandler<>)), publicOnly: false)
-            .AsImplementedInterfaces()
-            .WithScopedLifetime());
-
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly, includeInternalTypes: true);
-
-        services.AddScoped<IEmbeddingsService, EmbeddingsService>();
-        services.AddScoped<ICategoryEnrichmentService, CategoryEnrichmentService>();
-        services.AddScoped<IParseTodoEnrichmentService, ParseTodoEnrichmentService>();
-        services.AddScoped<ISubTaskEnrichmentService, SubTaskEnrichmentService>();
-        services.AddScoped<IRewriteEnrichmentService, RewriteEnrichmentService>();
-        services.AddScoped<ITodoActivityService, TodoActivityService>();
-
-        services.AddOpenAI(configuration);
-
-        services.AddElasticsearch(configuration);
-
-        services.AddRabbitMq(configuration);
-
-        return services;
-    }
-
-    public static IServiceCollection AddDataProcessorApplication(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddElasticsearch(configuration);
-
-        services.AddRabbitMq(configuration);
-
-        services.AddRabbitMqConsumer<TodoCreatedIntegrationEvent, TodoCreatedIntegrationEventHandler>(queue: "todo-created");
-
-        services.AddRabbitMqConsumer<TodoUpdatedIntegrationEvent, TodoUpdatedIntegrationEventHandler>(queue: "todo-updated");
-
-        services.AddRabbitMqConsumer<TodoDeletedIntegrationEvent, TodoDeletedIntegrationEventHandler>(queue: "todo-deleted");
-
-        services.AddRabbitMqConsumer<TodoAttachmentIntegrationEvent, TodoAttachmentIntegrationEventHandler>(queue: "todo-attachment");
-
-        services.AddRabbitMqConsumer<TodoBreakdownIntegrationEvent, TodoBreakdownIntegrationEventHandler>(queue: "todo-breakdown");
-
-        services.AddRabbitMqConsumer<TodoDependencyIntegrationEvent, TodoDependencyIntegrationEventHandler>(queue: "todo-dependency");
-
-        services.AddRabbitMqConsumer<TodoRewriteIntegrationEvent, TodoRewriteIntegrationEventHandler>(queue: "todo-rewrite");
-
-        services.AddRabbitMqConsumer<UserCreatedIntegrationEvent, UserCreatedIntegrationEventHandler>(queue: "user-created");
-
-        services.AddRabbitMqConsumer<UserUpdatedIntegrationEvent, UserUpdatedIntegrationEventHandler>(queue: "user-updated");
-
-        services.AddRabbitMqConsumer<UserDeletedIntegrationEvent, UserDeletedIntegrationEventHandler>(queue: "user-deleted");
-
-        services.AddHostedService<RebuildIndexHostedService>();
-
-        return services;
     }
 }

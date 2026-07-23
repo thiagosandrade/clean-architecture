@@ -1,5 +1,8 @@
 <Solution>
   <Folder Name="/docker/">
+    <File Path="src/Docker/.env.development" />
+    <File Path="src/Docker/.env.test" />
+    <File Path="src/Docker/docker-build.run.ps1" />
     <Project Path="src/Docker/docker-compose.dcproj" Id="34bb3069-d5d0-4046-acad-a2025ed7678f">
       <BuildType Project="Debug" />
       <Build />
@@ -19,7 +22,6 @@
   <Folder Name="/src/microservices/">
     <Project Path="src/Microservices/DataProcessor.Api/DataProcessor.Api.csproj" Id="40608110-aaf7-441c-804e-d74531a4d2e0" />
     <Project Path="src/Microservices/Web.Api/Web.Api.csproj" />
-	
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/ArchitectureTests/ArchitectureTests.csproj" />

@@ -45,11 +45,9 @@ internal sealed class CreateTodoCommandHandler(
 
         await context.SaveChangesAsync(cancellationToken);
 
-        todoItem.Raise(new TodoItemCreatedDomainEvent(todoItem.Id));
-        
         todoItem.Raise(new TodoActivityLogRequestedDomainEvent(todoItem.Id, TaskActivityType.TaskCreated, "Task Created", user.Id));
 
-        await publisher.PublishAsync(new TodoCreatedIntegrationEvent(todoItem.Id, todoItem.UserId, todoItem.Description), cancellationToken);
+        await publisher.PublishAsync(new TodoEmbeddingRequestedIntegrationEvent(todoItem.Id, todoItem.UserId, todoItem.Description), cancellationToken);
 
         return todoItem.Id;
     }

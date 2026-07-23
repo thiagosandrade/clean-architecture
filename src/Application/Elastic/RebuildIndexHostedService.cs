@@ -1,20 +1,28 @@
 ﻿using Application.Elastic.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Elastic;
 
 internal sealed class RebuildIndexHostedService(
-    IElasticTodoSearchService elasticTodoSearchService,
-    IElasticUserSearchService elasticUsersSearchService,
+    IServiceScopeFactory scopeFactory,
     ILogger<RebuildIndexHostedService> logger) : IHostedService
 {
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         logger.LogInformation("Starting Elasticsearch bootstrap...");
 
-        await elasticTodoSearchService.RebuildTodoIndexAsync(cancellationToken);
-        await elasticUsersSearchService.RebuildUsersAsync(cancellationToken);
+        using IServiceScope scope = scopeFactory.CreateScope();
+
+        IElasticTodoSearchService todoSearchService =
+            scope.ServiceProvider.GetRequiredService<IElasticTodoSearchService>();
+
+        IElasticUserSearchService userSearchService =
+            scope.ServiceProvider.GetRequiredService<IElasticUserSearchService>();
+
+        await todoSearchService.RebuildTodoIndexAsync(cancellationToken);
+        await userSearchService.RebuildUsersAsync(cancellationToken);
 
         logger.LogInformation("Elasticsearch bootstrap completed.");
     }
