@@ -12,7 +12,7 @@ public sealed class TodoItem : Entity
     public IEnumerable<string> Labels { get; set; } = [];
     public IEnumerable<string> Categories { get; set; } = [];
     public bool IsCompleted { get; set; }
-    public DateTime? CompletedAt { get; set; }
+    public DateTime? CompletedOn { get; set; }
     public Priority Priority { get; set; }
     public Vector? Embedding { get; set; } = default!;
 

@@ -1,6 +1,7 @@
 using Application.Common.Interfaces;
 using Application.Elastic.Constants;
 using Application.Elastic.Documents;
+using Application.Elastic.Mappings;
 using Domain.Todos;
 using Domain.Users;
 using Elastic.Clients.Elasticsearch;
@@ -18,8 +19,9 @@ namespace Application.Elastic.Services;
 public interface IElasticUserSearchService
 {
     Task IndexUserAsync(Guid userId, CancellationToken cancellationToken = default);
-    Task RebuildUsersAsync(CancellationToken cancellationToken = default);
+    Task RebuildUserIndexAsync(CancellationToken cancellationToken = default);
     Task<List<UserSearchDocument>> SearchUsersAsync(string text, int limit, CancellationToken cancellationToken = default);
+    Task<UserSearchDocument?> GetUserAsync(Guid id, CancellationToken cancellationToken);
 }
 
 internal sealed class ElasticUserSearchService : IElasticUserSearchService
@@ -35,20 +37,20 @@ internal sealed class ElasticUserSearchService : IElasticUserSearchService
         this.applicationDbContext = applicationDbContext;
     }
 
+    #region Index
+
     public async Task IndexUserAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        global::Elastic.Clients.Elasticsearch.IndexManagement.ExistsResponse exists = await client.Indices.ExistsAsync(ElasticSearchConstants.ElasticUsersIndex, cancellationToken);
-
-        if (!exists.Exists)
+        if (!(await client.Indices.ExistsAsync(ElasticSearchConstants.ElasticUserIndex, cancellationToken)).Exists)
         {
-            CreateIndexResponse indexResponse = await client.Indices.CreateAsync(ElasticSearchConstants.ElasticUsersIndex, cancellationToken);
+            CreateIndexResponse createResponse = await client.Indices.CreateAsync(UserIndexMappings.Create(), cancellationToken);
 
-            if (!indexResponse.IsValidResponse)
+            if (!createResponse.IsValidResponse)
             {
-                logger.LogError("Failed to index document: {Reason}", indexResponse.ElasticsearchServerError?.Error?.Reason);
+                throw new InvalidOperationException($"Failed to create Elasticsearch index: {createResponse.ElasticsearchServerError?.Error?.Reason}");
             }
 
-            logger.LogInformation("Created Elasticsearch index 'todos'.");
+            logger.LogInformation("Created Elasticsearch index 'users'.");
         }
 
         User? user = await applicationDbContext.Users
@@ -67,7 +69,9 @@ internal sealed class ElasticUserSearchService : IElasticUserSearchService
             Id = user.Id,
             FirstName = user.FirstName,
             LastName = user.LastName,
-            Email = user.Email
+            Email = user.Email,
+            CreatedOn = user.CreatedOn,
+            UpdatedOn = user.UpdatedOn
         };
 
         await client.IndexAsync(
@@ -76,8 +80,24 @@ internal sealed class ElasticUserSearchService : IElasticUserSearchService
             cancellationToken);
     }
 
-    public async Task RebuildUsersAsync(CancellationToken cancellationToken = default)
+    public async Task RebuildUserIndexAsync(CancellationToken cancellationToken = default)
     {
+        logger.LogInformation("Rebuilding Elasticsearch index...");
+
+        if ((await client.Indices.ExistsAsync(ElasticSearchConstants.ElasticUserIndex, cancellationToken)).Exists)
+        {
+            await client.Indices.DeleteAsync(ElasticSearchConstants.ElasticUserIndex, cancellationToken);
+
+            CreateIndexResponse createResponse = await client.Indices.CreateAsync(UserIndexMappings.Create(), cancellationToken);
+
+            if (!createResponse.IsValidResponse)
+            {
+                throw new InvalidOperationException($"Failed to create Elasticsearch index: {createResponse.ElasticsearchServerError?.Error?.Reason}");
+            }
+
+            logger.LogInformation("Created Elasticsearch index 'users'.");
+        }
+
         int total = await applicationDbContext.Users.CountAsync(cancellationToken);
 
         for (int skip = 0; skip < total; skip += ElasticSearchConstants.BatchSize)
@@ -93,17 +113,49 @@ internal sealed class ElasticUserSearchService : IElasticUserSearchService
                         Id = x.Id,
                         FirstName = x.FirstName,
                         LastName = x.LastName,
-                        Email = x.Email
+                        Email = x.Email,
+                        UpdatedOn = x.UpdatedOn,
+                        CreatedOn = x.CreatedOn
                     })
                     .ToListAsync(cancellationToken);
 
             await client.BulkAsync(b => b
-                .Index(ElasticSearchConstants.ElasticUsersIndex)
+                .Index(ElasticSearchConstants.ElasticUserIndex)
                 .IndexMany(batch),
                 cancellationToken);
         }
     }
 
+    #endregion
+
+    #region Queries
+    
+    public async Task<UserSearchDocument?> GetUserAsync(Guid id, CancellationToken cancellationToken)
+    {
+        SearchResponse<UserSearchDocument> response =
+            await client.SearchAsync<UserSearchDocument>(s => s
+                .Indices(ElasticSearchConstants.ElasticUserIndex)
+                .Size(1)
+                .Query(q => q
+                    .Bool(b => b
+                        .Filter(
+                            f => f.Term(t => t
+                                .Field(ElasticSearchConstants.Id)
+                                .Value(id.ToString()))
+                        )
+                    )
+                ),
+                cancellationToken);
+
+        if (!response.IsValidResponse)
+        {
+            logger.LogError("Elasticsearch search failed: {Reason}", response.ElasticsearchServerError?.Error?.Reason);
+
+            return null;
+        }
+
+        return response.Documents.SingleOrDefault();
+    }
     public async Task<List<UserSearchDocument>> SearchUsersAsync(string text, int limit, CancellationToken cancellationToken = default)
     {
         var wildcardQueries = ElasticSearchConstants.UserFields
@@ -116,7 +168,7 @@ internal sealed class ElasticUserSearchService : IElasticUserSearchService
 
         SearchResponse<UserSearchDocument> response =
             await client.SearchAsync<UserSearchDocument>(s => s
-                .Indices(ElasticSearchConstants.ElasticUsersIndex)
+                .Indices(ElasticSearchConstants.ElasticUserIndex)
                 .Size(limit)
                 .Query(q => q
                     .Bool(b => b
@@ -134,6 +186,9 @@ internal sealed class ElasticUserSearchService : IElasticUserSearchService
 
         return [.. response.Documents];
     }
+    
+    #endregion
+
 }
 
 

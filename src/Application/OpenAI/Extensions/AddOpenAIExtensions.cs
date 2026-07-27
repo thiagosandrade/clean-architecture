@@ -11,8 +11,16 @@ public static class AddOpenAIExtensions
 {
     public static void AddOpenAI(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton(new OpenAIClient(
-                    configuration["AIConfig:OpenAIKey"]
-                ));
+        services.AddSingleton(sp =>
+        {
+            string? apiKey = configuration["AIConfig:OpenAIKey"];
+
+            if (string.IsNullOrWhiteSpace(apiKey))
+            {
+                throw new InvalidOperationException("OpenAI API key was not configured.");
+            }
+
+            return new OpenAIClient(apiKey);
+        });
     }
 }

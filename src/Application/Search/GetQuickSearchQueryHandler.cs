@@ -17,7 +17,7 @@ internal sealed class GetQuickSearchQueryHandler(
     {
         int limit = query.Limit <= 0 ? 5 : query.Limit;
 
-        Task<List<TodoDocument>> todoDocumentsTask = elasticTodoSearchService.SearchTodosAsync(query.UserId, query.Text, limit, cancellationToken);
+        Task<List<TodoDocument>> todoDocumentsTask = elasticTodoSearchService.GetQuickSearchDetailAsync(query.UserId, query.Text, limit, cancellationToken);
 
         Task<List<UserSearchDocument>> userDocumentsTask = elasticUsersSearchService.SearchUsersAsync(query.Text, limit, cancellationToken);
 

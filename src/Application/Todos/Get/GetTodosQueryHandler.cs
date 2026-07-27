@@ -1,13 +1,14 @@
 ﻿using Application.Common.Interfaces;
+using Application.Elastic.Documents;
+using Application.Elastic.Services;
+using Application.OpenAI.Embeddings;
 using Domain.API;
 using Domain.Users;
-using Microsoft.EntityFrameworkCore;
 using SharedKernel.Abstractions.Messaging;
-using System.Linq.Dynamic.Core;
 
 namespace Application.Todos.Get;
 
-internal sealed class GetTodosQueryHandler(IApplicationDbContext context, IUserContext userContext)
+internal sealed class GetTodosQueryHandler(IElasticTodoSearchService elasticSearchService, IUserContext userContext)
     : IQueryHandler<GetTodosQuery, PagedResponse<TodoItemResponse>>
 {
     public async Task<Result<PagedResponse<TodoItemResponse>>> Handle(GetTodosQuery query, CancellationToken cancellationToken)
@@ -17,93 +18,44 @@ internal sealed class GetTodosQueryHandler(IApplicationDbContext context, IUserC
             return Result.Failure<PagedResponse<TodoItemResponse>>(UserErrors.Unauthorized());
         }
 
-        IQueryable<TodoItemResponse> todos = context.TodoItems
-            .AsNoTracking()
-            .Where(todoItem => todoItem.UserId == query.UserId)
-            .Select(todoItem => new TodoItemResponse
+        PagedResponse<TodoDocument> result =
+            await elasticSearchService.SearchTodosAsync(
+                query.UserId,
+                query.Filter,
+                query.Sorting,
+                query.Pagination,
+                cancellationToken);
+
+        var todos = result.Items
+            .Select(todo => new TodoItemResponse
             {
-                Id = todoItem.Id,
-                UserId = todoItem.UserId,
-                Description = todoItem.Description,
-                DueDate = todoItem.DueDate,
-                Labels = todoItem.Labels,
-                Categories = todoItem.Categories,
-                IsCompleted = todoItem.IsCompleted,
-                CreatedAt = todoItem.CreatedOn,
-                CompletedAt = todoItem.CompletedAt,
-                Priority = todoItem.Priority,
-                SubItems = todoItem.SubItems.Select(y => new TodoSubItemResponse()
-                {
-                    TodoItemId = y.TodoItemId,
-                    Id = y.Id,
-                    Description = y.Description,
-                    IsCompleted = y.IsCompleted,
-                    Order = y.Order,
-                    CreatedAt = y.CreatedOn,
-                    CompletedAt = y.CompletedAt
-                })
-            });
+                Id = todo.Id,
+                UserId = todo.UserId,
+                Description = todo.Description,
+                DueDate = todo.DueDate,
+                Labels = todo.Labels,
+                Categories = todo.Categories,
+                IsCompleted = todo.IsCompleted,
+                CreatedOn = todo.CreatedOn,
+                CompletedOn = todo.CompletedOn,
+                Priority = (Domain.Todos.Priority)todo.Priority,
 
-        //QUERYING
-        if (query.Filter is not null)
-        {
-            if (query.Filter.Priority.HasValue)
-            {
-                todos = todos.Where(x => x.Priority == query.Filter.Priority.Value);
-            }
+                SubItems = todo.Subtasks.Select(subItem =>
+                    new TodoSubItemResponse
+                    {
+                        TodoItemId = subItem.SubItemId,
+                        Id = subItem.Id,
+                        Description = subItem.Description,
+                        IsCompleted = subItem.IsCompleted,
+                        Order = subItem.Order,
+                        CreatedOn = subItem.CreatedOn,
+                        CompletedOn = subItem.CompletedOn
+                    })
+            })
+            .ToList();
 
-            if (query.Filter.IsCompleted.HasValue)
-            {
-                todos = todos.Where(x => x.IsCompleted == query.Filter.IsCompleted.Value);
-            }
-
-            if (query.Filter.DueDateFrom.HasValue && query.Filter.DueDateTo.HasValue)
-            {
-                var start = query.Filter.DueDateFrom.Value.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
-                var end = query.Filter.DueDateTo.Value.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
-                todos = todos.Where(x => x.DueDate >= start && x.DueDate < end);
-            }
-
-            if (query.Filter.DueDateFrom.HasValue && !query.Filter.DueDateTo.HasValue)
-            {
-                var start = query.Filter.DueDateFrom.Value.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
-                todos = todos.Where(x => x.DueDate >= start);
-            }
-
-            if (!query.Filter.DueDateFrom.HasValue && query.Filter.DueDateTo.HasValue)
-            {
-                var end = query.Filter.DueDateTo.Value.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
-                todos = todos.Where(x => x.DueDate < end);
-            }
-        }
-
-        int totalItems = await todos.CountAsync(cancellationToken);
-
-
-        // SORTING
-        if (query.Sorting is not null)
-        {
-            string direction = query.Sorting.Descending
-                ? "descending"
-                : "ascending";
-
-            todos = todos.OrderBy(
-                $"{query.Sorting.PropertyName} {direction}");
-        }
-
-
-        // PAGINATION
-        if (query.Pagination is not null)
-        {
-            todos = todos
-                .Skip((query.Pagination.Page - 1) * query.Pagination.Size)
-                .Take(query.Pagination.Size);
-        }
-
-        List<TodoItemResponse> resultTodos = await todos.ToListAsync(cancellationToken);
-
-        var result = new PagedResponse<TodoItemResponse>(resultTodos, totalItems);
-
-        return result;
+        return new PagedResponse<TodoItemResponse>(
+            todos,
+            result.Total);
     }
 }

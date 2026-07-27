@@ -10,9 +10,9 @@ public class TodoSubItemResponse
 
     public bool IsCompleted { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedOn { get; set; }
 
-    public DateTime? CompletedAt { get; set; }
+    public DateTime? CompletedOn { get; set; }
 
     public int Order { get; set; }
 }

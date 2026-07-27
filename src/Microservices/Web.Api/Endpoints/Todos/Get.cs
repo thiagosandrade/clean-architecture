@@ -17,7 +17,7 @@ public sealed class GetTodosRequest
 
     public int Size { get; init; } = 20;
 
-    public string PropertyName { get; init; } = "CreatedAt";
+    public string PropertyName { get; init; } = "CreatedOn";
 
     public bool Descending { get; init; }
 

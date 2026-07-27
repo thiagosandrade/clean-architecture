@@ -55,7 +55,7 @@ internal sealed class EditTodoCommandHandler(
 
 
         todoItem.IsCompleted = command.IsCompleted;
-        todoItem.CompletedAt = command.IsCompleted ? dateTimeProvider.UtcNow : null;
+        todoItem.CompletedOn = command.IsCompleted ? dateTimeProvider.UtcNow : null;
 
 
         context.TodoItems.Update(todoItem);

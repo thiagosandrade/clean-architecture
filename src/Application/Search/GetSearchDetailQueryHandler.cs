@@ -1,4 +1,6 @@
 using Application.Common.Interfaces;
+using Application.Elastic.Documents;
+using Application.Elastic.Services;
 using Domain.API;
 using Domain.Todos;
 using Domain.Users;
@@ -7,7 +9,7 @@ using SharedKernel.Abstractions.Messaging;
 
 namespace Application.Search;
 
-internal sealed class GetSearchDetailQueryHandler(IApplicationDbContext context)
+internal sealed class GetSearchDetailQueryHandler(IElasticTodoSearchService elasticTodoSearchService, IElasticUserSearchService elasticUserSearchService)
     : IQueryHandler<GetSearchDetailQuery, SearchDetailResponse>
 {
     private const string TODOITEM = "TODOITEM";
@@ -44,29 +46,20 @@ internal sealed class GetSearchDetailQueryHandler(IApplicationDbContext context)
 
     private async Task<Result<SearchDetailResponse>> HandleTodoItem(GetSearchDetailQuery query, CancellationToken cancellationToken)
     {
-        TodoItem? todo = await context.TodoItems
-            .AsNoTracking()
-            .Include(t => t.SubItems)
-            .Include(t => t.Attachments)
-            .Where(t => t.Id == query.Id && t.UserId == query.UserId)
-            .SingleOrDefaultAsync(cancellationToken);
+        TodoDocument? todo = await elasticTodoSearchService.GetSearchDetailAsync(query.Id, query.UserId, cancellationToken);
 
         if (todo is null)
         {
             return Result.Failure<SearchDetailResponse>(UserErrors.NotFound(query.Id));
         }
 
-        var owner = await context.Users
-            .AsNoTracking()
-            .Where(u => u.Id == todo.UserId)
-            .Select(u => new { u.FirstName, u.LastName })
-            .SingleOrDefaultAsync(cancellationToken);
+        UserSearchDocument? owner =  await elasticUserSearchService.GetUserAsync(query.UserId, cancellationToken);
 
         List<SearchDetailLink> links = [];
 
-        if (todo.SubItems != null)
+        if (todo.Subtasks != null)
         {
-            links.AddRange(todo.SubItems.Select(s => new SearchDetailLink
+            links.AddRange(todo.Subtasks.Select(s => new SearchDetailLink
             {
                 Type = "todoSubItem",
                 Id = s.Id,
@@ -89,7 +82,7 @@ internal sealed class GetSearchDetailQueryHandler(IApplicationDbContext context)
             Type = "todoItem",
             Id = todo.Id,
             Title = todo.Description,
-            Subtitle = todo.Priority.ToString(),
+            Subtitle = ((Priority)todo.Priority).ToString(),
             Summary = new SearchDetailSummary
             {
                 CreatedBy = owner is null ? string.Empty : owner.FirstName + " " + owner.LastName,
@@ -102,10 +95,10 @@ internal sealed class GetSearchDetailQueryHandler(IApplicationDbContext context)
             {
                 todo.Id,
                 todo.Description,
-                Priority = (int)todo.Priority,
+                todo.Priority,
                 todo.DueDate,
                 todo.IsCompleted,
-                Subtasks = todo.SubItems?.Select(s => new { s.Id, s.Description, s.IsCompleted }).ToList(),
+                Subtasks = todo.Subtasks?.Select(s => new { s.Id, s.Description, s.IsCompleted }).ToList(),
                 Attachments = todo.Attachments?.Select(a => new { a.Id, a.OriginalFileName, a.ContentType, a.Size }).ToList()
             }
         };
@@ -115,27 +108,22 @@ internal sealed class GetSearchDetailQueryHandler(IApplicationDbContext context)
 
     private async Task<Result<SearchDetailResponse>> HandleSubItem(GetSearchDetailQuery query, CancellationToken cancellationToken)
     {
-        TodoSubItem? subItem = await context.TodoSubItems
-            .AsNoTracking()
-            .Where(s => s.Id == query.Id)
-            .SingleOrDefaultAsync(cancellationToken);
+        TodoDocument? parentTask = await elasticTodoSearchService.GetSearchDetailAsync(query.Id, query.UserId, cancellationToken);
 
-        if (subItem is null)
-        {
-            return Result.Failure<SearchDetailResponse>(UserErrors.NotFound(query.Id));
-        }
-
-        TodoItem? parentTask = await context.TodoItems
-            .AsNoTracking()
-            .Where(t => t.Id == subItem.TodoItemId && t.UserId == query.UserId)
-            .SingleOrDefaultAsync(cancellationToken);
 
         if (parentTask is null)
         {
             return Result.Failure<SearchDetailResponse>(UserErrors.NotFound(query.Id));
         }
 
-        var response = new SearchDetailResponse
+        TodoSubtaskDocument? subItem = parentTask.Subtasks.SingleOrDefault(x => x.Id == query.Id);
+
+        if (subItem is null)
+        {
+            return Result.Failure<SearchDetailResponse>(UserErrors.NotFound(query.Id));
+        }
+
+        return new SearchDetailResponse
         {
             Type = "todoSubItem",
             Id = subItem.Id,
@@ -150,37 +138,40 @@ internal sealed class GetSearchDetailQueryHandler(IApplicationDbContext context)
             },
             Links =
             [
-                new() { Type = "TodoItem", Id = parentTask.Id, Description = parentTask.Description }
+                new()
+            {
+                Type = "todoItem",
+                Id = parentTask.Id,
+                Description = parentTask.Description
+            }
             ],
-            Data = new { subItem.Id, subItem.Description, subItem.IsCompleted, TaskId = parentTask.Id }
+            Data = new
+            {
+                subItem.Id,
+                subItem.Description,
+                subItem.IsCompleted,
+                TaskId = parentTask.Id
+            }
         };
-
-        return response;
     }
-
     private async Task<Result<SearchDetailResponse>> HandleAttachment(GetSearchDetailQuery query, CancellationToken cancellationToken)
     {
-        TodoAttachment? attachment = await context.TodoAttachments
-            .AsNoTracking()
-            .Where(a => a.Id == query.Id)
-            .SingleOrDefaultAsync(cancellationToken);
+        TodoDocument? todoItem = await elasticTodoSearchService.GetSearchDetailAsync(query.Id, query.UserId, cancellationToken);
 
-        if (attachment is null)
-        {
-            return Result.Failure<SearchDetailResponse>(UserErrors.NotFound(query.Id));
-        }
-
-        TodoItem? todoItem = await context.TodoItems
-            .AsNoTracking()
-            .Where(t => t.Id == attachment.TodoItemId && t.UserId == query.UserId)
-            .SingleOrDefaultAsync(cancellationToken);
 
         if (todoItem is null)
         {
             return Result.Failure<SearchDetailResponse>(UserErrors.NotFound(query.Id));
         }
 
-        var response = new SearchDetailResponse
+        TodoAttachmentDocument? attachment = todoItem.Attachments.SingleOrDefault(x => x.Id == query.Id);
+
+        if (attachment is null)
+        {
+            return Result.Failure<SearchDetailResponse>(UserErrors.NotFound(query.Id));
+        }
+
+        return new SearchDetailResponse
         {
             Type = "attachment",
             Id = attachment.Id,
@@ -189,27 +180,32 @@ internal sealed class GetSearchDetailQueryHandler(IApplicationDbContext context)
             Summary = new SearchDetailSummary
             {
                 CreatedBy = string.Empty,
-                CreatedOn = attachment.CreatedOn,
-                UpdatedOn = attachment.UpdatedOn,
-                Status = string.Empty
+                CreatedOn = todoItem.CreatedOn,
+                UpdatedOn = todoItem.UpdatedOn, 
+                Status = todoItem.IsCompleted ? "Completed" : "Active"
             },
             Links =
             [
-                new() { Type = "todoItem", Id = todoItem.Id, Description = todoItem.Description }
+                new()
+            {
+                Type = "todoItem",
+                Id = todoItem.Id,
+                Description = todoItem.Description
+            }
             ],
-            Data = new { attachment.Id, attachment.OriginalFileName, attachment.ContentType, attachment.Size, TaskId = todoItem.Id }
+            Data = new
+            {
+                attachment.Id,
+                attachment.OriginalFileName,
+                attachment.ContentType,
+                attachment.Size,
+                TaskId = todoItem.Id
+            }
         };
-
-        return response;
     }
-
     private async Task<Result<SearchDetailResponse>> HandleUser(GetSearchDetailQuery query, CancellationToken cancellationToken)
     {
-        var userEntity = await context.Users
-            .AsNoTracking()
-            .Where(u => u.Id == query.Id)
-            .Select(u => new { u.Id, u.Email, u.FirstName, u.LastName, u.CreatedOn, u.UpdatedOn })
-            .SingleOrDefaultAsync(cancellationToken);
+        UserSearchDocument? userEntity = await elasticUserSearchService.GetUserAsync(query.UserId, cancellationToken);
 
         if (userEntity is null)
         {

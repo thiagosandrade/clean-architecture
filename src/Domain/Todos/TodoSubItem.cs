@@ -15,7 +15,7 @@ public class TodoSubItem : Entity
 
     public bool IsCompleted { get; set; }
 
-    public DateTime? CompletedAt { get; set; }
+    public DateTime? CompletedOn { get; set; }
 
     public int Order { get; set; }
 

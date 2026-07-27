@@ -12,5 +12,5 @@ public sealed class EditTodoCommand : ICommand<Guid>
     public List<string> Labels { get; set; } = [];
     public Priority Priority { get; set; }
     public bool IsCompleted { get; set; }
-    public DateTime? CompletedAt { get; set; }
+    public DateTime? CompletedOn { get; set; }
 }

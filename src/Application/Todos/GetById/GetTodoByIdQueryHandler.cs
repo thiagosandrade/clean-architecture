@@ -25,16 +25,16 @@ internal sealed class GetTodoByIdQueryHandler(IApplicationDbContext context, IUs
                 Labels = todoItem.Labels,
                 IsCompleted = todoItem.IsCompleted,
                 Priority = todoItem.Priority,
-                CreatedAt = todoItem.CreatedOn,
-                CompletedAt = todoItem.CompletedAt,
+                CreatedOn = todoItem.CreatedOn,
+                CompletedOn = todoItem.CompletedOn,
                 Categories = todoItem.Categories,
                 SubItems = todoItem.SubItems.OrderBy(x => x.Order).Select(x => new TodoSubItemResponse()
                 {
                     Id  = x.Id,
                     TodoItemId = x.TodoItemId,
                     Description = x.Description,
-                    CreatedAt = x.CreatedOn,
-                    CompletedAt = x.CompletedAt,
+                    CreatedOn = x.CreatedOn,
+                    CompletedOn = x.CompletedOn,
                     IsCompleted = x.IsCompleted,
                     Order = x.Order
                 }),

@@ -10,8 +10,8 @@ public class TodoItemResponse
     public DateTime? DueDate { get; set; }
     public Priority Priority { get; set; }
     public bool IsCompleted { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime? CompletedAt { get; set; }
+    public DateTime CreatedOn { get; set; }
+    public DateTime? CompletedOn { get; set; }
     public IEnumerable<string> Labels { get; set; }
     public IEnumerable<TodoSubItemResponse> SubItems { get; set; } = [];
     public IEnumerable<string> Categories { get; set; }

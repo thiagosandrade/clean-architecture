@@ -1,19 +1,16 @@
-﻿using System.Linq.Dynamic.Core;
-using Application.Common.Extensions;
-using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
+using Application.Elastic;
+using Application.Elastic.Documents;
+using Application.Elastic.Services;
 using Application.OpenAI.Embeddings;
 using Domain.API;
+using Domain.Todos;
 using Domain.Users;
-using Microsoft.EntityFrameworkCore;
-using Pgvector;
-using Pgvector.EntityFrameworkCore;
 using SharedKernel.Abstractions.Messaging;
 
 namespace Application.Todos.Search;
 
-internal sealed class SearchTodosQueryHandler(
-    IApplicationDbContext context,
-    IEmbeddingsService embeddingsService)
+internal sealed class SearchTodosQueryHandler(IElasticTodoSearchService elasticTodoSearchService, IEmbeddingsService embeddingsService)
     : IQueryHandler<SearchTodoItemsQuery, PagedResponse<SearchTodoItemResponse>>
 {
     private const int SemanticCandidateLimit = 1000;
@@ -28,78 +25,53 @@ internal sealed class SearchTodosQueryHandler(
                 UserErrors.Unauthorized());
         }
 
-        // 1. Generate embedding for search text
-        float[] vectorArray = await embeddingsService.GenerateEmbeddingsForSearchAsync(query.Searchtext);
+        float[] embedding =
+            await embeddingsService.GenerateEmbeddingsForSearchAsync(query.Searchtext);
 
-        // 2. Convert to pgvector
-        Vector queryVector = vectorArray.ToVector();
+        PagedResponse<TodoDocument> response =
+            await elasticTodoSearchService.SemanticSearchTodosAsync(
+                userId: query.UserId,
+                embedding: embedding,
+                page: query.Pagination?.Page ?? 1,
+                size: query.Pagination?.Size ?? 20,
+                sorting: query.Sorting,
+                candidateLimit: SemanticCandidateLimit,
+                cancellationToken);
 
-        // 3. Semantic search - retrieve closest candidates
-        IQueryable<SearchTodoItemResponse> todos =
-            context.TodoItems
-                .AsNoTracking()
-                .Where(x =>
-                    x.UserId == query.UserId &&
-                    x.Embedding != null)
-                .Select(todoItem => new
-                {
-                    Todo = todoItem,
-                    Distance = todoItem.Embedding!.CosineDistance(queryVector)
-                })
-                .OrderBy(x => x.Distance)
-                .Take(SemanticCandidateLimit)
-                .Select(x => new SearchTodoItemResponse
-                {
-                    Id = x.Todo.Id,
-                    UserId = x.Todo.UserId,
-                    Description = x.Todo.Description,
-                    DueDate = x.Todo.DueDate,
-                    Labels = x.Todo.Labels,
-                    Categories = x.Todo.Categories,
-                    IsCompleted = x.Todo.IsCompleted,
-                    CreatedAt = x.Todo.CreatedOn,
-                    CompletedAt = x.Todo.CompletedAt,
-                    Priority = x.Todo.Priority,
-                    Similarity = 1 - x.Distance,
-                    SubItems = x.Todo.SubItems.Select(y => new SearchTodoSubItemResponse()
+        List<SearchTodoItemResponse> todos =
+        [
+            .. response.Items.Select(todo => new SearchTodoItemResponse
+            {
+                Id = todo.Id,
+                UserId = todo.UserId,
+                Description = todo.Description,
+                DueDate = todo.DueDate,
+                IsCompleted = todo.IsCompleted,
+                CreatedOn = todo.CreatedOn,
+                Priority = (Priority)todo.Priority,
+
+                Labels = todo.Labels,
+
+                Categories = todo.Categories,
+
+                // Elasticsearch returns the score instead of distance.
+                Similarity = 0,
+
+                SubItems =
+                [
+                    .. todo.Subtasks.Select(x => new SearchTodoSubItemResponse
                     {
-                        CompletedAt = y.CompletedAt,
-                        CreatedAt = y.CreatedOn,
-                        Order = y.Order,
-                        Description = y.Description,
-                        IsCompleted = y.IsCompleted,
-                        TodoItemId = y.TodoItemId
+                        Description = x.Description,
+                        CompletedOn = x.CompletedOn,
+                        CreatedOn = default,
+                        IsCompleted = x.IsCompleted,
+                        Order = x.Order,
+                        TodoItemId = todo.Id
                     })
-                });
+                ]
+            })
+        ];
 
-
-        // 4. Count semantic results BEFORE pagination
-        int totalItems = await todos.CountAsync(cancellationToken);
-
-        // 5. Apply user sorting AFTER semantic filtering
-        if (query.Sorting != null && !string.IsNullOrEmpty(query.Sorting.PropertyName))
-        {
-            string direction = query.Sorting.Descending
-                ? "descending"
-                : "ascending";
-
-            todos = todos.OrderBy($"{query.Sorting.PropertyName} {direction}");
-        }
-
-        // 6. Apply pagination
-        if (query.Pagination is not null)
-        {
-            todos = todos
-                .Skip((query.Pagination.Page - 1) * query.Pagination.Size)
-                .Take(query.Pagination.Size);
-        }
-
-        // 7. Execute
-        List<SearchTodoItemResponse> resultTodos =
-            await todos.ToListAsync(cancellationToken);
-
-        return new PagedResponse<SearchTodoItemResponse>(
-            resultTodos,
-            totalItems);
+        return new PagedResponse<SearchTodoItemResponse>(todos, response.Total);
     }
 }

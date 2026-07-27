@@ -5,9 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Elastic;
 
-internal sealed class RebuildIndexHostedService(
-    IServiceScopeFactory scopeFactory,
-    ILogger<RebuildIndexHostedService> logger) : IHostedService
+internal sealed class RebuildIndexHostedService(IServiceScopeFactory scopeFactory, ILogger<RebuildIndexHostedService> logger) : IHostedService
 {
     public async Task StartAsync(CancellationToken cancellationToken)
     {
@@ -15,14 +13,13 @@ internal sealed class RebuildIndexHostedService(
 
         using IServiceScope scope = scopeFactory.CreateScope();
 
-        IElasticTodoSearchService todoSearchService =
-            scope.ServiceProvider.GetRequiredService<IElasticTodoSearchService>();
+        IElasticTodoSearchService todoSearchService = scope.ServiceProvider.GetRequiredService<IElasticTodoSearchService>();
 
-        IElasticUserSearchService userSearchService =
-            scope.ServiceProvider.GetRequiredService<IElasticUserSearchService>();
+        IElasticUserSearchService userSearchService = scope.ServiceProvider.GetRequiredService<IElasticUserSearchService>();
 
         await todoSearchService.RebuildTodoIndexAsync(cancellationToken);
-        await userSearchService.RebuildUsersAsync(cancellationToken);
+
+        await userSearchService.RebuildUserIndexAsync(cancellationToken);
 
         logger.LogInformation("Elasticsearch bootstrap completed.");
     }
